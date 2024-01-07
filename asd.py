@@ -5,7 +5,7 @@ from math import sin, pi
 
 
 SAMPLE_RATE = 44100
-DURATION = 10
+DURATION = 3
 FREQUENCY = 1000
 
 def square_wave(x, duty_cycle):
@@ -22,7 +22,7 @@ def two_monos_to_stereo(left: bytes, right: bytes) -> bytes:
 def play(duty_cycle):
     left_channel_data = b"".join(
         round(
-            square_wave(FREQUENCY*i/SAMPLE_RATE, duty_cycle) * 0
+            square_wave(FREQUENCY*i/SAMPLE_RATE, duty_cycle) * 0x7fff
         ).to_bytes(2, byteorder='little', signed=True)
         for i in range(round(DURATION * SAMPLE_RATE))
     )
@@ -48,11 +48,8 @@ def play(duty_cycle):
     os.system("cd /tmp && aplay -D front:CARD=PCH,DEV=0 a.wav")
 
 
-#duty_cycle = 0
-#while duty_cycle < 1:
-#    print(round(5*duty_cycle, 10))
-#    play(duty_cycle)
-#    duty_cycle += 0.02
-
-
-play(0.995)
+duty_cycle = 0
+while duty_cycle < 1:
+    print(round(duty_cycle, 10))
+    play(duty_cycle)
+    duty_cycle += 0.01
