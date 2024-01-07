@@ -1,11 +1,10 @@
 import os
 import io
 import wave
-from math import sin, pi
 
 
 SAMPLE_RATE = 44100
-DURATION = 3
+DURATION = 2
 FREQUENCY = 1000
 
 def square_wave(x, duty_cycle):
@@ -45,11 +44,15 @@ def play(duty_cycle):
     with open('/tmp/a.wav', 'wb') as file:
         file.write(f.getvalue())
 
-    os.system("cd /tmp && aplay -D front:CARD=PCH,DEV=0 a.wav")
+    # desktop
+    #os.system("cd /tmp && aplay -D front:CARD=PCH,DEV=0 a.wav")
+
+    # laptop
+    os.system("cd /tmp && aplay -D front:CARD=Intel,DEV=0 a.wav")
 
 
 duty_cycle = 0
 while duty_cycle < 1:
     print(round(duty_cycle, 10))
-    play(duty_cycle)
-    duty_cycle += 0.01
+    play(1-duty_cycle)  # laptop needs inverting?
+    duty_cycle += 0.001
