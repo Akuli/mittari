@@ -3,8 +3,8 @@ from functools import partial
 from typing import cast, Any
 from tkinter import ttk, messagebox
 
-from config import Config
-from audio_interface import PMWAudioPlayer, list_audio_devices
+from mittari.config import Config
+from mittari.audio_interface import PMWAudioPlayer, list_audio_devices
 
 
 def on_slider_moved(player: PMWAudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
@@ -114,22 +114,3 @@ def run_gui(player: PMWAudioPlayer) -> None:
 
     root.protocol("WM_DELETE_WINDOW", (lambda: confirm_and_quit(root, player.config)))
     root.mainloop()
-
-
-def main() -> None:
-    config = Config()
-    try:
-        config.load()
-    except FileNotFoundError:
-        pass
-
-    player = PMWAudioPlayer(config)
-    player.start()
-
-    try:
-        run_gui(player)
-    finally:
-        player.stop_everything()
-
-
-main()

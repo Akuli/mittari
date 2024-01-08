@@ -3,7 +3,7 @@ import sys
 import threading
 import time
 
-from config import Config
+from mittari.config import Config
 
 
 def list_audio_devices() -> list[str]:
