@@ -1,7 +1,7 @@
 import tkinter
 from functools import partial
 from typing import cast, Any
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from config import Config
 from audio_interface import PMWAudioPlayer, list_audio_devices
@@ -18,13 +18,12 @@ def play_single_channel(
 
 
 def on_slider_moved(player: PMWAudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
-    player.config.percentage_to_pmw[channel_num][percentage] = float(new_value) / 100
+    player.config.percentage_to_pwm[channel_num][percentage] = float(new_value) / 100
     play_single_channel(player, channel_num, percentage)
 
 
 def create_meter_configurator(
     player: PMWAudioPlayer,
-    config: Config,
     parent: ttk.Frame,
     text: str,
     channel_num: int,
@@ -33,11 +32,13 @@ def create_meter_configurator(
     container.grid_columnconfigure(1, weight=1)
 
     for y, percentage in enumerate(range(0, 101, 10)):
+        pwm_value = player.config.percentage_to_pwm[channel_num][percentage]
         label = ttk.Label(container, text=f"{percentage}%:")
         slider = ttk.Scale(
             container,
             from_=0,
             to=100,
+            value=100 * pwm_value,
             command=partial(on_slider_moved, player, channel_num, percentage),
         )
 
@@ -61,12 +62,33 @@ def create_device_selector(parent: ttk.Frame, config: Config) -> ttk.Frame:
     return container
 
 
+def save_and_exit(root: tkinter.Tk, config: Config) -> None:
+    config.save()
+    root.destroy()
+
+
+def confirm_and_quit(root: tkinter.Tk, config: Config) -> None:
+    if config.has_changed():
+        result = messagebox.askyesnocancel("Mittari Configurator", "Do you want to save your changes?")
+        if result is None:
+            # cancel pressed
+            return
+        if result:
+            config.save()
+    root.destroy()
+
+
 def main() -> None:
     root = tkinter.Tk()
     root.title("Mittari Configurator")
     root.minsize(700, 500)
 
     config = Config()
+    try:
+        config.load()
+    except FileNotFoundError:
+        pass
+
     player = PMWAudioPlayer(config)
     player.start()
 
@@ -77,10 +99,10 @@ def main() -> None:
     device_selector.grid(row=0, column=0, columnspan=2, padx=10, pady=20)
 
     left = create_meter_configurator(
-        player, config, big_frame, "Calibration for CPU Usage (left)", 0
+        player, big_frame, "Calibration for CPU Usage (left)", 0
     )
     right = create_meter_configurator(
-        player, config, big_frame, "Calibration for Memory (right)", 1
+        player, big_frame, "Calibration for Memory (right)", 1
     )
 
     left.grid(row=1, column=0, sticky="nswe", padx=5, pady=10)
@@ -94,9 +116,16 @@ def main() -> None:
     button_frame = ttk.Frame(root)
     button_frame.pack(fill="x")
 
-    ttk.Button(button_frame, text="Save").pack(side="right")
-    ttk.Button(button_frame, text="Cancel", command=root.destroy).pack(side="right")
+    ok_button = ttk.Button(button_frame, text="Save and Exit", command=(lambda: save_and_exit(root, config)))
+    cancel_button = ttk.Button(button_frame, text="Cancel", command=root.destroy)
 
+    ok_button.pack(side="right")
+    cancel_button.pack(side="right")
+
+    status_bar = ttk.Label(root)
+    status_bar.pack(fill="x")
+
+    root.protocol("WM_DELETE_WINDOW", (lambda: confirm_and_quit(root, config)))
     root.mainloop()
 
 

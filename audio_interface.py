@@ -15,21 +15,21 @@ def list_audio_devices() -> list[str]:
     ]
 
 
-def map_percentage_to_pmw(config: Config, channel_num: int, percentage: float) -> float:
+def map_percentage_to_pwm(config: Config, channel_num: int, percentage: float) -> float:
     assert 0 <= percentage <= 100
-    percentage_to_pmw = config.percentage_to_pmw[channel_num]
+    percentage_to_pwm = config.percentage_to_pwm[channel_num]
 
     # Pick surrounding two values and do linear interpolation
-    zero_to_100 = sorted(percentage_to_pmw.keys())
+    zero_to_100 = sorted(percentage_to_pwm.keys())
     assert 0 in zero_to_100
     assert 100 in zero_to_100
 
     for lower, upper in zip(zero_to_100[:-1], zero_to_100[1:]):
         if lower <= percentage <= upper:
-            lower_pmw = percentage_to_pmw[lower]
-            upper_pmw = percentage_to_pmw[upper]
-            slope = (upper_pmw - lower_pmw)/(upper - lower)
-            return lower_pmw + slope*(percentage - lower)
+            lower_pwm = percentage_to_pwm[lower]
+            upper_pwm = percentage_to_pwm[upper]
+            slope = (upper_pwm - lower_pwm)/(upper - lower)
+            return lower_pwm + slope*(percentage - lower)
 
     raise RuntimeError("this should not be possible...")
 
@@ -39,21 +39,21 @@ FREQUENCY = 1000
 
 
 def construct_audio_data(config: Config, values: list[float | None]) -> bytes:
-    pmw_values = []
+    pwm_values = []
     for channel_num, percentage in enumerate(values):
         if percentage is None:
-            pmw_values.append(0.0)
+            pwm_values.append(0.0)
         else:
-            pmw_values.append(map_percentage_to_pmw(config, channel_num, percentage))
+            pwm_values.append(map_percentage_to_pwm(config, channel_num, percentage))
 
     duration = 0.1
     audio_data = bytearray()
 
     for sample_num in range(round(duration * SAMPLE_RATE)):
-        for pmw in pmw_values:
+        for pwm in pwm_values:
             time = sample_num / SAMPLE_RATE
             phase = (time * FREQUENCY) % 1
-            if phase < pmw:
+            if phase < pwm:
                 sample = 0x7fff
             else:
                 sample = 0
@@ -77,7 +77,7 @@ class PMWAudioPlayer:
             "--rate",
             str(SAMPLE_RATE),
             "--channels",
-            str(len(self.config.percentage_to_pmw)),
+            str(len(self.config.percentage_to_pwm)),
             "--device",
             self.config.audio_device,
             "--buffer-size",
