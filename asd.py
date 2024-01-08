@@ -48,11 +48,11 @@ def play(duty_cycle):
     #os.system("cd /tmp && aplay -D front:CARD=PCH,DEV=0 a.wav")
 
     # laptop
-    os.system("cd /tmp && aplay -D front:CARD=Intel,DEV=0 a.wav")
+    os.system("cd /tmp && aplay -f cd -D front:CARD=Intel,DEV=0 a.wav")
 
 
 duty_cycle = 0
 while duty_cycle < 1:
     print(round(duty_cycle, 10))
     play(1-duty_cycle)  # laptop needs inverting?
-    duty_cycle += 0.001
+    duty_cycle += 0.1
