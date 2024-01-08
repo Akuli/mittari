@@ -66,7 +66,7 @@ class PMWAudioPlayer:
     def __init__(self, config: Config) -> None:
         self.config = config
         self.thread: threading.Thread | None = None
-        self.now_playing: list[float | None] = []
+        self._now_playing: list[float | None] = []
         self.stopping: bool = False
 
     def get_command(self) -> list[str]:
@@ -89,13 +89,25 @@ class PMWAudioPlayer:
             return  # already started
 
         self.stopping = False
-        self.thread = threading.Thread(target=self._feed_audio_to_process, daemon=True)
+        self.thread = threading.Thread(target=self._feed_audio_to_process)
         self.thread.start()
 
-    def stop(self) -> None:
+    def stop_everything(self) -> None:
         self.stopping = True
         if self.thread is not None:
             self.thread.join()
+
+    def play(self, percentages: list[float | None]) -> None:
+        print("Play percentages:", percentages)
+        self._now_playing = percentages
+
+    def play_single_channel(self, channel_num: int, percentage: float) -> None:
+        percentages: list[float | None] = [None] * self.config.num_channels
+        percentages[channel_num] = percentage
+        self.play(percentages)
+
+    def stop_playing(self) -> None:
+        self.play([None] * self.config.num_channels)
 
     def _feed_audio_to_process(self) -> None:
         process = None
@@ -114,7 +126,7 @@ class PMWAudioPlayer:
                 assert process is not None
                 assert process.stdin is not None
 
-                audio_data = construct_audio_data(self.config, self.now_playing)
+                audio_data = construct_audio_data(self.config, self._now_playing)
                 try:
                     process.stdin.write(audio_data)
                     process.stdin.flush()

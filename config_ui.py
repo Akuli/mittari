@@ -7,19 +7,9 @@ from config import Config
 from audio_interface import PMWAudioPlayer, list_audio_devices
 
 
-def play_single_channel(
-    player: PMWAudioPlayer,
-    channel_num: int,
-    percentage: int,
-    *junk: object,
-) -> None:
-    player.now_playing = [None] * player.config.num_channels
-    player.now_playing[channel_num] = percentage
-
-
 def on_slider_moved(player: PMWAudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
     player.config.percentage_to_pwm[channel_num][percentage] = float(new_value) / 100
-    play_single_channel(player, channel_num, percentage)
+    player.play_single_channel(channel_num, percentage)
 
 
 def create_meter_configurator(
@@ -41,6 +31,12 @@ def create_meter_configurator(
             value=100 * pwm_value,
             command=partial(on_slider_moved, player, channel_num, percentage),
         )
+
+        slider.bind(
+            "<Enter>",
+            (lambda event, p=percentage: player.play_single_channel(channel_num, p)),  # type: ignore
+        )
+        slider.bind("<Leave>", (lambda event: player.stop_playing()))
 
         label.grid(row=y, column=0)
         slider.grid(row=y, column=1, sticky="we")
@@ -78,24 +74,15 @@ def confirm_and_quit(root: tkinter.Tk, config: Config) -> None:
     root.destroy()
 
 
-def main() -> None:
+def run_gui(player: PMWAudioPlayer) -> None:
     root = tkinter.Tk()
     root.title("Mittari Configurator")
     root.minsize(700, 500)
 
-    config = Config()
-    try:
-        config.load()
-    except FileNotFoundError:
-        pass
-
-    player = PMWAudioPlayer(config)
-    player.start()
-
     big_frame = ttk.Frame(root)
     big_frame.pack(fill="both", expand=True)
 
-    device_selector = create_device_selector(big_frame, config)
+    device_selector = create_device_selector(big_frame, player.config)
     device_selector.grid(row=0, column=0, columnspan=2, padx=10, pady=20)
 
     left = create_meter_configurator(
@@ -116,7 +103,7 @@ def main() -> None:
     button_frame = ttk.Frame(root)
     button_frame.pack(fill="x")
 
-    ok_button = ttk.Button(button_frame, text="Save and Exit", command=(lambda: save_and_exit(root, config)))
+    ok_button = ttk.Button(button_frame, text="Save and Exit", command=(lambda: save_and_exit(root, player.config)))
     cancel_button = ttk.Button(button_frame, text="Cancel", command=root.destroy)
 
     ok_button.pack(side="right")
@@ -125,8 +112,24 @@ def main() -> None:
     status_bar = ttk.Label(root)
     status_bar.pack(fill="x")
 
-    root.protocol("WM_DELETE_WINDOW", (lambda: confirm_and_quit(root, config)))
+    root.protocol("WM_DELETE_WINDOW", (lambda: confirm_and_quit(root, player.config)))
     root.mainloop()
+
+
+def main() -> None:
+    config = Config()
+    try:
+        config.load()
+    except FileNotFoundError:
+        pass
+
+    player = PMWAudioPlayer(config)
+    player.start()
+
+    try:
+        run_gui(player)
+    finally:
+        player.stop_everything()
 
 
 main()
