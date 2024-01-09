@@ -2,6 +2,7 @@ import subprocess
 import sys
 import threading
 import time
+from math import sin, pi
 
 from mittari.config import Config
 
@@ -52,11 +53,7 @@ def construct_audio_data(config: Config, meter_percentages: list[float | None]) 
     for sample_num in range(round(duration * SAMPLE_RATE)):
         for pwm in pwm_values:
             time = sample_num / SAMPLE_RATE
-            phase = (time * FREQUENCY) % 1
-            if phase < pwm:
-                sample = 0x7fff
-            else:
-                sample = 0
+            sample = round(sin(2 * pi * time * FREQUENCY) * pwm * 0x7fff)
             audio_data += sample.to_bytes(2, byteorder="little", signed=True)
 
     return bytes(audio_data)
