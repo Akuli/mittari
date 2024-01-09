@@ -3,7 +3,7 @@ import time
 
 from mittari.config import Config
 from mittari.system_info import get_cpu_usage, get_mem_usage
-from mittari.audio_interface import PWMAudioPlayer, DURATION
+from mittari.audio_interface import AudioPlayer, DURATION
 
 
 def update_meters_forever(player):
@@ -26,10 +26,11 @@ def main() -> None:
     config = Config()
     try:
         config.load()
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        print("Loading config file failed:", e)
         pass
 
-    player = PWMAudioPlayer(config)
+    player = AudioPlayer(config)
     player.start()
 
     try:
