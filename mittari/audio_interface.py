@@ -11,7 +11,7 @@ def list_audio_devices() -> list[str]:
     return [
         line.strip()
         for line in output.splitlines()
-        if ":" in line and not line.startswith(" ")
+        if line.strip() and not line.startswith(" ")
     ]
 
 
@@ -38,9 +38,9 @@ SAMPLE_RATE = 44100
 FREQUENCY = 1000
 
 
-def construct_audio_data(config: Config, values: list[float | None]) -> bytes:
+def construct_audio_data(config: Config, meter_percentages: list[float | None]) -> bytes:
     pwm_values = []
-    for channel_num, percentage in enumerate(values):
+    for channel_num, percentage in enumerate(meter_percentages):
         if percentage is None:
             pwm_values.append(0.0)
         else:
@@ -62,11 +62,11 @@ def construct_audio_data(config: Config, values: list[float | None]) -> bytes:
     return bytes(audio_data)
 
 
-class PMWAudioPlayer:
+class PWMAudioPlayer:
     def __init__(self, config: Config) -> None:
         self.config = config
         self.thread: threading.Thread | None = None
-        self._now_playing: list[float | None] = []
+        self.now_playing: list[float | None] = []
         self.stopping: bool = False
 
     def get_command(self) -> list[str]:
@@ -99,7 +99,7 @@ class PMWAudioPlayer:
 
     def play(self, percentages: list[float | None]) -> None:
         print("Play percentages:", percentages)
-        self._now_playing = percentages
+        self.now_playing = percentages
 
     def play_single_channel(self, channel_num: int, percentage: float) -> None:
         percentages: list[float | None] = [None] * self.config.num_channels
@@ -126,7 +126,7 @@ class PMWAudioPlayer:
                 assert process is not None
                 assert process.stdin is not None
 
-                audio_data = construct_audio_data(self.config, self._now_playing)
+                audio_data = construct_audio_data(self.config, self.now_playing)
                 try:
                     process.stdin.write(audio_data)
                     process.stdin.flush()

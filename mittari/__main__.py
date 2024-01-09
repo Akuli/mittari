@@ -1,5 +1,5 @@
 from mittari.config import Config
-from mittari.audio_interface import PMWAudioPlayer
+from mittari.audio_interface import PWMAudioPlayer
 from mittari.config_ui import run_gui
 
 
@@ -10,7 +10,7 @@ def main() -> None:
     except FileNotFoundError:
         pass
 
-    player = PMWAudioPlayer(config)
+    player = PWMAudioPlayer(config)
     player.start()
 
     try:

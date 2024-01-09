@@ -1,19 +1,34 @@
+import random
 import tkinter
 from functools import partial
 from typing import cast, Any
 from tkinter import ttk, messagebox
 
 from mittari.config import Config
-from mittari.audio_interface import PMWAudioPlayer, list_audio_devices
+from mittari.audio_interface import PWMAudioPlayer, list_audio_devices
 
 
-def on_slider_moved(player: PMWAudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
+def create_device_selector(parent: ttk.Frame, config: Config) -> ttk.Frame:
+    container = ttk.Frame(parent)
+    ttk.Label(container, text="Audio Device: ").pack(side="left")
+
+    var = tkinter.StringVar()
+    var.set(config.audio_device)
+    var.trace_add("write", lambda *junk: setattr(config, "audio_device", var.get()))
+    selector = ttk.Combobox(container, textvariable=var, values=list_audio_devices(), width=30)
+    selector.pack(side="left")
+
+    cast(Any, selector).i_dont_want_garbage_collection_to_eat_the_var = var
+    return container
+
+
+def on_slider_moved(player: PWMAudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
     player.config.percentage_to_pwm[channel_num][percentage] = float(new_value) / 100
     player.play_single_channel(channel_num, percentage)
 
 
 def create_meter_configurator(
-    player: PMWAudioPlayer,
+    player: PWMAudioPlayer,
     parent: ttk.Frame,
     text: str,
     channel_num: int,
@@ -44,18 +59,38 @@ def create_meter_configurator(
     return container
 
 
-def create_device_selector(parent: ttk.Frame, config: Config) -> ttk.Frame:
-    container = ttk.Frame(parent)
-    ttk.Label(container, text="Audio Device: ").pack(side="left")
+def create_test_button(player: PWMAudioPlayer, parent: ttk.Frame) -> ttk.Button:
+    def start_test() -> None:
+        left = random.randint(0, 100)
+        right = random.randint(0, 100)
+        player.play([left, right])
 
-    var = tkinter.StringVar()
-    var.set(config.audio_device)
-    var.trace_add("write", lambda *junk: setattr(config, "audio_device", var.get()))
-    selector = ttk.Combobox(container, textvariable=var, values=list_audio_devices(), width=30)
-    selector.pack(side="left")
+    button = ttk.Button(parent, text="Test the configuration", command=start_test)
+    button.pack(padx=5, pady=5)
+    button.bind("<Leave>", (lambda e: player.stop_playing()))
 
-    cast(Any, selector).i_dont_want_garbage_collection_to_eat_the_var = var
-    return container
+    return button
+
+
+def create_status_label(player: PWMAudioPlayer, parent: ttk.Frame) -> ttk.Label:
+    label = ttk.Label(parent)
+
+    def update() -> None:
+        label.after(50, update)
+
+        left, right = player.now_playing or [None, None]
+        if left is not None and right is not None:
+            text = f"Left meter should be at {left}% and right at {right}%."
+        elif left is not None:
+            text = f"Left meter should be at {left}%."
+        elif right is not None:
+            text = f"Right meter should be at {right}%."
+        else:
+            text = ""
+        label.config(text=text)
+
+    update()
+    return label
 
 
 def save_and_exit(root: tkinter.Tk, config: Config) -> None:
@@ -74,7 +109,7 @@ def confirm_and_quit(root: tkinter.Tk, config: Config) -> None:
     root.destroy()
 
 
-def run_gui(player: PMWAudioPlayer) -> None:
+def run_gui(player: PWMAudioPlayer) -> None:
     root = tkinter.Tk()
     root.title("Mittari Configurator")
     root.minsize(700, 500)
@@ -83,20 +118,23 @@ def run_gui(player: PMWAudioPlayer) -> None:
     big_frame.pack(fill="both", expand=True)
 
     device_selector = create_device_selector(big_frame, player.config)
-    device_selector.grid(row=0, column=0, columnspan=2, padx=10, pady=20)
+    device_selector.pack(padx=10, pady=20)
+
+    meter_configurator_container = ttk.Frame(big_frame)
+    meter_configurator_container.pack(fill="both", expand=True)
 
     left = create_meter_configurator(
-        player, big_frame, "Calibration for CPU Usage (left)", 0
+        player, meter_configurator_container, "Calibration for CPU Usage (left)", 0
     )
     right = create_meter_configurator(
-        player, big_frame, "Calibration for Memory (right)", 1
+        player, meter_configurator_container, "Calibration for Memory (right)", 1
     )
 
-    left.grid(row=1, column=0, sticky="nswe", padx=5, pady=10)
-    right.grid(row=1, column=1, sticky="nswe", padx=5, pady=10)
+    left.pack(side="left", fill="both", expand=True, padx=5, pady=10)
+    right.pack(side="right", fill="both", expand=True, padx=5, pady=10)
 
-    big_frame.grid_rowconfigure(1, weight=1)
-    big_frame.grid_columnconfigure([0, 1], weight=1)
+    create_test_button(player, big_frame).pack()
+    create_status_label(player, big_frame).pack()
 
     ttk.Separator(root).pack(fill="x")
 
@@ -106,11 +144,8 @@ def run_gui(player: PMWAudioPlayer) -> None:
     ok_button = ttk.Button(button_frame, text="Save and Exit", command=(lambda: save_and_exit(root, player.config)))
     cancel_button = ttk.Button(button_frame, text="Cancel", command=root.destroy)
 
-    ok_button.pack(side="right")
-    cancel_button.pack(side="right")
-
-    status_bar = ttk.Label(root)
-    status_bar.pack(fill="x")
+    ok_button.pack(side="right", padx=5, pady=5)
+    cancel_button.pack(side="right", padx=5, pady=5)
 
     root.protocol("WM_DELETE_WINDOW", (lambda: confirm_and_quit(root, player.config)))
     root.mainloop()
