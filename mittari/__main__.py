@@ -3,13 +3,13 @@ import time
 
 from mittari.config import Config
 from mittari.system_info import get_cpu_usage, get_mem_usage
-from mittari.audio_interface import PWMAudioPlayer
+from mittari.audio_interface import PWMAudioPlayer, DURATION
 
 
 def update_meters_forever(player):
     while True:
         player.play([get_cpu_usage() * 100, get_mem_usage() * 100])
-        time.sleep(0.2)
+        time.sleep(DURATION)
 
 
 def main() -> None:

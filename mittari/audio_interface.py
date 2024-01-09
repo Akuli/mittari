@@ -36,6 +36,7 @@ def map_percentage_to_pwm(config: Config, channel_num: int, percentage: float) -
 
 SAMPLE_RATE = 44100
 FREQUENCY = 1000
+DURATION = 0.2
 
 
 def construct_audio_data(config: Config, meter_percentages: list[float | None]) -> bytes:
@@ -46,10 +47,9 @@ def construct_audio_data(config: Config, meter_percentages: list[float | None]) 
         else:
             pwm_values.append(map_percentage_to_pwm(config, channel_num, percentage))
 
-    duration = 0.2
     audio_data = bytearray()
 
-    for sample_num in range(round(duration * SAMPLE_RATE)):
+    for sample_num in range(round(DURATION * SAMPLE_RATE)):
         for pwm in pwm_values:
             time = sample_num / SAMPLE_RATE
             phase = (time * FREQUENCY) % 1
