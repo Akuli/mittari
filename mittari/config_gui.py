@@ -4,8 +4,8 @@ from functools import partial
 from typing import cast, Any
 from tkinter import ttk, messagebox
 
-from mittari.config import Config
-from mittari.audio_interface import PWMAudioPlayer, list_audio_devices
+from mittari.config import Config, MAX_GAIN
+from mittari.audio_interface import AudioPlayer, list_audio_devices
 
 
 def create_device_selector(parent: ttk.Frame, config: Config) -> ttk.Frame:
@@ -22,13 +22,13 @@ def create_device_selector(parent: ttk.Frame, config: Config) -> ttk.Frame:
     return container
 
 
-def on_slider_moved(player: PWMAudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
-    player.config.percentage_to_pwm[channel_num][percentage] = float(new_value) / 100
+def on_slider_moved(player: AudioPlayer, channel_num: int, percentage: int, new_value: str) -> None:
+    player.config.percentage_to_gain[channel_num][percentage] = float(new_value) / 100 * MAX_GAIN
     player.play_single_channel(channel_num, percentage)
 
 
 def create_meter_configurator(
-    player: PWMAudioPlayer,
+    player: AudioPlayer,
     parent: ttk.Frame,
     text: str,
     channel_num: int,
@@ -37,13 +37,13 @@ def create_meter_configurator(
     container.grid_columnconfigure(1, weight=1)
 
     for y, percentage in enumerate(range(0, 101, 10)):
-        pwm_value = player.config.percentage_to_pwm[channel_num][percentage]
+        gain = player.config.percentage_to_gain[channel_num][percentage]
         label = ttk.Label(container, text=f"{percentage}%:")
         slider = ttk.Scale(
             container,
             from_=0,
             to=100,
-            value=100 * pwm_value,
+            value=100 * gain / MAX_GAIN,
             command=partial(on_slider_moved, player, channel_num, percentage),
         )
 
@@ -59,7 +59,7 @@ def create_meter_configurator(
     return container
 
 
-def create_test_button(player: PWMAudioPlayer, parent: ttk.Frame) -> ttk.Button:
+def create_test_button(player: AudioPlayer, parent: ttk.Frame) -> ttk.Button:
     def start_test() -> None:
         left = random.randint(0, 100)
         right = random.randint(0, 100)
@@ -72,7 +72,7 @@ def create_test_button(player: PWMAudioPlayer, parent: ttk.Frame) -> ttk.Button:
     return button
 
 
-def create_status_label(player: PWMAudioPlayer, parent: ttk.Frame) -> ttk.Label:
+def create_status_label(player: AudioPlayer, parent: ttk.Frame) -> ttk.Label:
     label = ttk.Label(parent)
 
     def update() -> None:
@@ -109,7 +109,7 @@ def confirm_and_quit(root: tkinter.Tk, config: Config) -> None:
     root.destroy()
 
 
-def run_gui(player: PWMAudioPlayer) -> None:
+def run_gui(player: AudioPlayer) -> None:
     root = tkinter.Tk()
     root.title("Mittari Configurator")
     root.minsize(700, 500)

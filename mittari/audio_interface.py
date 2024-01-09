@@ -16,21 +16,21 @@ def list_audio_devices() -> list[str]:
     ]
 
 
-def map_percentage_to_pwm(config: Config, channel_num: int, percentage: float) -> float:
+def map_percentage_to_gain(config: Config, channel_num: int, percentage: float) -> float:
     assert 0 <= percentage <= 100
-    percentage_to_pwm = config.percentage_to_pwm[channel_num]
+    percentage_to_gain = config.percentage_to_gain[channel_num]
 
     # Pick surrounding two values and do linear interpolation
-    zero_to_100 = sorted(percentage_to_pwm.keys())
+    zero_to_100 = sorted(percentage_to_gain.keys())
     assert 0 in zero_to_100
     assert 100 in zero_to_100
 
     for lower, upper in zip(zero_to_100[:-1], zero_to_100[1:]):
         if lower <= percentage <= upper:
-            lower_pwm = percentage_to_pwm[lower]
-            upper_pwm = percentage_to_pwm[upper]
-            slope = (upper_pwm - lower_pwm)/(upper - lower)
-            return lower_pwm + slope*(percentage - lower)
+            lower_gain = percentage_to_gain[lower]
+            upper_gain = percentage_to_gain[upper]
+            slope = (upper_gain - lower_gain)/(upper - lower)
+            return lower_gain + slope*(percentage - lower)
 
     raise RuntimeError("this should not be possible...")
 
@@ -40,26 +40,29 @@ FREQUENCY = 1000
 
 
 def construct_audio_data(config: Config, meter_percentages: list[float | None]) -> bytes:
-    pwm_values = []
+    gains = []
     for channel_num, percentage in enumerate(meter_percentages):
         if percentage is None:
-            pwm_values.append(0.0)
+            gains.append(0.0)
         else:
-            pwm_values.append(map_percentage_to_pwm(config, channel_num, percentage))
+            gain = map_percentage_to_gain(config, channel_num, percentage)
+            assert 0 <= gain <= 1
+            gains.append(gain)
 
     duration = 0.2
     audio_data = bytearray()
 
     for sample_num in range(round(duration * SAMPLE_RATE)):
-        for pwm in pwm_values:
+        for gain in gains:
+            assert 0 <= gain <= 1
             time = sample_num / SAMPLE_RATE
-            sample = round(sin(2 * pi * time * FREQUENCY) * pwm * 0x7fff)
+            sample = round(sin(2 * pi * time * FREQUENCY) * gain * 0x7fff)
             audio_data += sample.to_bytes(2, byteorder="little", signed=True)
 
     return bytes(audio_data)
 
 
-class PWMAudioPlayer:
+class AudioPlayer:
     def __init__(self, config: Config) -> None:
         self.config = config
         self.thread: threading.Thread | None = None
@@ -74,7 +77,7 @@ class PWMAudioPlayer:
             "--rate",
             str(SAMPLE_RATE),
             "--channels",
-            str(len(self.config.percentage_to_pwm)),
+            str(len(self.config.percentage_to_gain)),
             "--device",
             self.config.audio_device,
             "--buffer-size",
