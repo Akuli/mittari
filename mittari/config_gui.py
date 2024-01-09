@@ -51,7 +51,6 @@ def create_meter_configurator(
             "<Enter>",
             (lambda event, p=percentage: player.play_single_channel(channel_num, p)),  # type: ignore
         )
-        slider.bind("<Leave>", (lambda event: player.stop_playing()))
 
         label.grid(row=y, column=0)
         slider.grid(row=y, column=1, sticky="we")
@@ -59,38 +58,17 @@ def create_meter_configurator(
     return container
 
 
-def create_test_button(player: AudioPlayer, parent: ttk.Frame) -> ttk.Button:
-    def start_test() -> None:
-        left = random.randint(0, 100)
-        right = random.randint(0, 100)
-        player.play([left, right])
-
-    button = ttk.Button(parent, text="Test the configuration", command=start_test)
-    button.pack(padx=5, pady=5)
-    button.bind("<Leave>", (lambda e: player.stop_playing()))
-
-    return button
+def play_random(player: AudioPlayer) -> None:
+    left = random.randint(0, 100)
+    right = random.randint(0, 100)
+    player.play([left, right])
 
 
-def create_status_label(player: AudioPlayer, parent: ttk.Frame) -> ttk.Label:
-    label = ttk.Label(parent)
+def update_status_label(player: AudioPlayer, label: ttk.Label) -> None:
+    label.after(50, update_status_label, player, label)
 
-    def update() -> None:
-        label.after(50, update)
-
-        left, right = player.now_playing or [None, None]
-        if left is not None and right is not None:
-            text = f"Left meter should be at {left}% and right at {right}%."
-        elif left is not None:
-            text = f"Left meter should be at {left}%."
-        elif right is not None:
-            text = f"Right meter should be at {right}%."
-        else:
-            text = ""
-        label.config(text=text)
-
-    update()
-    return label
+    cpu, ram = player.now_playing
+    label.config(text=f"Meters should be showing {round(cpu)}% CPU and {round(ram)}% RAM.")
 
 
 def save_and_exit(root: tkinter.Tk, config: Config) -> None:
@@ -133,8 +111,14 @@ def run_gui(player: AudioPlayer) -> None:
     left.pack(side="left", fill="both", expand=True, padx=5, pady=10)
     right.pack(side="right", fill="both", expand=True, padx=5, pady=10)
 
-    create_test_button(player, big_frame).pack()
-    create_status_label(player, big_frame).pack()
+    test_button = ttk.Button(
+        big_frame, text="Test with random values", command=lambda: play_random(player),
+    )
+    test_button.pack(padx=5, pady=5)
+
+    status_label = ttk.Label(big_frame)
+    status_label.pack()
+    update_status_label(player, status_label)
 
     ttk.Separator(root).pack(fill="x")
 

@@ -37,12 +37,12 @@ def map_percentage_to_gain(config: Config, channel_num: int, percentage: float) 
 
 SAMPLE_RATE = 44100
 FREQUENCY = 1000
-DURATION = 0.2
+DURATION = 0.1
 
 
-def construct_audio_data(config: Config, meter_percentages: list[float | None]) -> bytes:
+def construct_audio_data(config: Config, percentages: list[float]) -> bytes:
     gains = []
-    for channel_num, percentage in enumerate(meter_percentages):
+    for channel_num, percentage in enumerate(percentages):
         if percentage is None:
             gains.append(0.0)
         else:
@@ -66,7 +66,7 @@ class AudioPlayer:
     def __init__(self, config: Config) -> None:
         self.config = config
         self.thread: threading.Thread | None = None
-        self.now_playing: list[float | None] = []
+        self.now_playing: list[float] = [0.0] * config.num_channels
         self.stopping: bool = False
 
     def get_command(self) -> list[str]:
@@ -80,8 +80,8 @@ class AudioPlayer:
             str(len(self.config.percentage_to_gain)),
             "--device",
             self.config.audio_device,
-            "--buffer-size",
-            "10000",
+            "--buffer-time",
+            str(round(DURATION * 1_000_000)),  # seconds to microseconds
         ]
 
     def start(self) -> None:
@@ -97,17 +97,17 @@ class AudioPlayer:
         if self.thread is not None:
             self.thread.join()
 
-    def play(self, percentages: list[float | None]) -> None:
+    def play(self, percentages: list[float]) -> None:
         print("Play percentages:", percentages)
         self.now_playing = percentages
 
     def play_single_channel(self, channel_num: int, percentage: float) -> None:
-        percentages: list[float | None] = [None] * self.config.num_channels
+        percentages = [0.0] * self.config.num_channels
         percentages[channel_num] = percentage
         self.play(percentages)
 
     def stop_playing(self) -> None:
-        self.play([None] * self.config.num_channels)
+        self.play([0.0] * self.config.num_channels)
 
     def _feed_audio_to_process(self) -> None:
         process = None
