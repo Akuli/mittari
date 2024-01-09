@@ -16,8 +16,8 @@ last_total_since_boot = None
 last_idle_since_boot = None
 
 
-# Returns between 0.0 and 1.0. Based on psutils source code.
 def get_cpu_usage() -> float:
+    """Returns between 0.0 and 1.0. Somewhat similar to psutil source code."""
     global last_total_since_boot
     global last_idle_since_boot
 
@@ -42,17 +42,8 @@ def get_cpu_usage() -> float:
     return result
 
 
-# Returns between 0.0 and 1.0.
 def get_mem_usage() -> float:
+    """Returns between 0.0 and 1.0."""
     total = grep_ints(r'MemTotal:\s+(\d+)\s+kB', '/proc/meminfo')[0]
     available = grep_ints(r'MemAvailable:\s+(\d+)\s+kB', '/proc/meminfo')[0]
     return (total - available)/total
-
-
-#while True:
-#    print("%.2f %.2f" % (get_cpu_usage(), get_mem_usage()))
-#    time.sleep(0.1)
-
-while True:
-    print('|' + ('x' * round(get_cpu_usage()*75)).ljust(75) + '|')
-    time.sleep(0.1)

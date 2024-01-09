@@ -46,7 +46,7 @@ def construct_audio_data(config: Config, meter_percentages: list[float | None]) 
         else:
             pwm_values.append(map_percentage_to_pwm(config, channel_num, percentage))
 
-    duration = 0.1
+    duration = 0.2
     audio_data = bytearray()
 
     for sample_num in range(round(duration * SAMPLE_RATE)):
@@ -81,7 +81,7 @@ class PWMAudioPlayer:
             "--device",
             self.config.audio_device,
             "--buffer-size",
-            "1000",
+            "10000",
         ]
 
     def start(self) -> None:
