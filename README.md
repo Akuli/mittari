@@ -21,10 +21,8 @@ I used the 5mA version.
 ## Circuit Design
 
 I designed an analog circuit to drive the meters and LEDs,
-because I like working with analog circuits
-and I don't know much about microcontrollers.
-
-Here is one half of the circuit, enough to drive one meter.
+because I haven't yet learned to throw a microcontroller at every electronics problem.
+Here is **one half** of the circuit, enough to drive one meter.
 The other half is similar.
 
 ![circuit diagram](circuit.png)
