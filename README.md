@@ -1,6 +1,7 @@
 # Mittari
 
-This electronics+software project adds analog CPU and RAM usage meters to my computer.
+This electronics project is an analog CPU and RAM usage meter for my computer.
+The idea is taken from [this youtube video](https://www.youtube.com/watch?v=4J-DTbZlJ5I).
 
 TODO: picture of device outside
 
@@ -51,13 +52,45 @@ because the transistor that drives the current meter would never turn off,
 so it would be impossible to make the meter go to zero.
 
 The UA798TC does't swing all the way to +5V.
-Because there is a 500 Ohm resistor in front of the transistor,
-the current meter hits its maximum at about `500ohm*5mA + 2*0.5V = 3.7V`.
-I am using `0.5V` as the diode drop,
-because the diode and transistor don't need to turn on fully for this to work.
+Because there is a 500 Ohm resistor in front of the transistor.
+For example, at 3.7V, the meter will surely hit its maximum,
+because there is enough voltage to
+go through the diode (0.6V), turn on the transistor (0.6V)
+and drive 5mA through the 500 Ohm resistor (2.5V).
 
 The small 1k resistor at the output represents the op-amp's internal output resistance.
 In reality it seems to be smaller than 1k.
 
-The first step is to remove any DC offset in the audio signal.
-My computer seems to do it by itself, so this step wouldn't be strictly necessary.
+
+## Software Setup
+
+The software assumes that you have Linux.
+The advantage of this is that it has no dependencies
+except Python's standard library and development tools.
+Let me know if you need to run the software on something else than Linux.
+
+I made an ugly but useful GUI to compensate for electronics inaccuracies in software.
+
+```
+$ python3 -m mittari config
+```
+
+The GUI looks like this:
+
+![config GUI](config-screenshot.png)
+
+Once configured, you can start displaying CPU and memory usage:
+
+```
+$ python3 -m mittari
+```
+
+If you want to develop the software, you should probably start with these commands:
+
+```
+$ python3 -m venv
+$ source env/bin/activate
+$ pip install -r requirements-dev.txt
+$ mypy mittari          # type checker
+$ python3 -m pytest     # run tests
+```
