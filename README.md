@@ -42,32 +42,35 @@ because I already had them.
 With small modifications, you can use whatever parts are available to you.
 Also, the resistor values don't need to match mine exactly.
 
-The op-amp's output must go near the ground,
-low enough to turn off the transistor driving the current meter can go down to 0mA.
-In my build, the dual op-amp charges one 100nF capacitor to 270mV and the other to 400mV for some reason.
+The op-amp's output must go near the ground.
+With no input signal, my dual op-amp charges the 100nF capacitor to 270mV on one side and 400mV on the other side.
 More than a diode drop (about 600mV) would be bad,
 because the transistor that drives the current meter would never turn off,
 so it would be impossible to make the meter go to zero.
 
-The UA798TC does't swing all the way to +5V.
-Because there is a 500 Ohm resistor in front of the transistor.
+The UA798TC doesn't swing all the way to +5V, but it doesn't matter.
 For example, at 3.7V, the meter will surely hit its maximum,
 because there is enough voltage to
 go through the diode (0.6V), turn on the transistor (0.6V)
 and drive 5mA through the 500 Ohm resistor (2.5V).
 
-The small 1k resistor at the output represents the op-amp's internal output resistance.
-In reality it seems to be smaller than 1k.
+The small 1k "resistor" represents the op-amp's internal output resistance.
+The output resistance of my op-amp seems to be much smaller than 1k,
+but I used 1k in the simulation to make sure it will work.
 
 
 ## Software Setup
 
-The software assumes that you have Linux.
-The advantage of this is that it has no dependencies
-except Python's standard library and development tools.
-Let me know if you need to run the software on something else than Linux.
+The software assumes that you have linux. Specifically, it uses:
+- `aplay` to play audio
+- `aplay -L` to list audio devices
+- `/proc/stat` to get CPU usage
+- `/proc/meminfo` to get RAM usage.
 
-I made an ugly but useful GUI to compensate for electronics inaccuracies in software.
+The advantage is that there are no dependencies except development tools and Python's standard library.
+Let me know if you need to run or develop the software on something else than Linux.
+
+I made an ugly but useful tkinter GUI to compensate for electronics inaccuracies in software.
 
 ```
 $ python3 -m mittari config
@@ -76,6 +79,11 @@ $ python3 -m mittari config
 The GUI looks like this:
 
 ![config GUI](config-screenshot.png)
+
+Each slider sets the audio volume used to move the meter to a given position.
+Linear interpolation is used.
+For example, to move the meter to 65%,
+the software will play audio with half the volume set by the 60% and 70% sliders.
 
 Once configured, you can start displaying CPU and memory usage:
 

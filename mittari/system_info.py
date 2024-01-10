@@ -1,5 +1,4 @@
 import re
-import time
 
 
 def grep_ints(regex, path):
