@@ -848,6 +848,44 @@
       <hideShortLeads>false</hideShortLeads>
       <style>SOLID</style>
     </diylc.connectivity.Jumper>
+    <diylc.connectivity.Jumper>
+      <name>J26</name>
+      <alpha>127</alpha>
+      <points>
+        <point x="6.8" y="5.300000000000001"/>
+        <point x="6.8" y="5.0"/>
+        <point x="6.8" y="5.15"/>
+      </points>
+      <bodyColor hex="ffffff"/>
+      <borderColor hex="000000"/>
+      <labelColor hex="000000"/>
+      <leadColor hex="0000ff"/>
+      <display>NAME</display>
+      <flipStanding>false</flipStanding>
+      <labelOriantation>Directional</labelOriantation>
+      <moveLabel>false</moveLabel>
+      <hideShortLeads>false</hideShortLeads>
+      <style>SOLID</style>
+    </diylc.connectivity.Jumper>
+    <diylc.connectivity.Jumper>
+      <name>J27</name>
+      <alpha>127</alpha>
+      <points>
+        <point x="9.8" y="5.300000000000001"/>
+        <point x="9.8" y="5.0"/>
+        <point x="9.8" y="5.15"/>
+      </points>
+      <bodyColor hex="ffffff"/>
+      <borderColor hex="000000"/>
+      <labelColor hex="000000"/>
+      <leadColor hex="0000ff"/>
+      <display>NAME</display>
+      <flipStanding>false</flipStanding>
+      <labelOriantation>Directional</labelOriantation>
+      <moveLabel>false</moveLabel>
+      <hideShortLeads>false</hideShortLeads>
+      <style>SOLID</style>
+    </diylc.connectivity.Jumper>
     <diylc.shapes.TapeMeasure>
       <name>TM4</name>
       <alpha>127</alpha>
@@ -900,30 +938,6 @@
       <displayNumbers>DIP</displayNumbers>
     </diylc.semiconductors.DIL__IC>
     <diylc.passive.Resistor>
-      <name>R1</name>
-      <alpha>127</alpha>
-      <length value="0.25" unit="in"/>
-      <width value="0.08" unit="in"/>
-      <points>
-        <point x="6.7" y="4.8"/>
-        <point x="6.7" y="5.2"/>
-        <point x="6.7" y="5.0"/>
-      </points>
-      <bodyColor hex="82cffd"/>
-      <borderColor hex="5b90b1"/>
-      <labelColor hex="000000"/>
-      <leadColor hex="cccccc"/>
-      <display>VALUE</display>
-      <flipStanding>false</flipStanding>
-      <labelOriantation>Directional</labelOriantation>
-      <moveLabel>false</moveLabel>
-      <hideShortLeads>false</hideShortLeads>
-      <value value="500.0" unit="R"/>
-      <power>HALF</power>
-      <colorCode>NONE</colorCode>
-      <shape>Standard</shape>
-    </diylc.passive.Resistor>
-    <diylc.passive.Resistor>
       <name>R3</name>
       <alpha>127</alpha>
       <length value="0.25" unit="in"/>
@@ -966,7 +980,7 @@
       <labelOriantation>Directional</labelOriantation>
       <moveLabel>false</moveLabel>
       <hideShortLeads>false</hideShortLeads>
-      <value value="15.0" unit="K"/>
+      <value value="12.0" unit="K"/>
       <power>HALF</power>
       <colorCode>NONE</colorCode>
       <shape>Standard</shape>
@@ -991,30 +1005,6 @@
       <moveLabel>false</moveLabel>
       <hideShortLeads>false</hideShortLeads>
       <value value="18.0" unit="K"/>
-      <power>HALF</power>
-      <colorCode>NONE</colorCode>
-      <shape>Standard</shape>
-    </diylc.passive.Resistor>
-    <diylc.passive.Resistor>
-      <name>R2</name>
-      <alpha>127</alpha>
-      <length value="0.25" unit="in"/>
-      <width value="0.08" unit="in"/>
-      <points>
-        <point x="6.8" y="5.0"/>
-        <point x="6.8" y="5.3"/>
-        <point x="6.8" y="5.15"/>
-      </points>
-      <bodyColor hex="ffcc99"/>
-      <borderColor hex="996600"/>
-      <labelColor hex="000000"/>
-      <leadColor hex="cccccc"/>
-      <display>VALUE</display>
-      <flipStanding>false</flipStanding>
-      <labelOriantation>Directional</labelOriantation>
-      <moveLabel>false</moveLabel>
-      <hideShortLeads>false</hideShortLeads>
-      <value value="8.2" unit="K"/>
       <power>HALF</power>
       <colorCode>NONE</colorCode>
       <shape>Standard</shape>
@@ -1265,30 +1255,6 @@
       <insideColor hex="e66e31"/>
     </diylc.semiconductors.DiodeGlass>
     <diylc.passive.Resistor>
-      <name>R9</name>
-      <alpha>127</alpha>
-      <length value="0.25" unit="in"/>
-      <width value="0.08" unit="in"/>
-      <points>
-        <point x="9.9" y="4.8"/>
-        <point x="9.9" y="5.2"/>
-        <point x="9.9" y="5.0"/>
-      </points>
-      <bodyColor hex="82cffd"/>
-      <borderColor hex="5b90b1"/>
-      <labelColor hex="000000"/>
-      <leadColor hex="cccccc"/>
-      <display>VALUE</display>
-      <flipStanding>false</flipStanding>
-      <labelOriantation>Directional</labelOriantation>
-      <moveLabel>false</moveLabel>
-      <hideShortLeads>false</hideShortLeads>
-      <value value="500.0" unit="R"/>
-      <power>HALF</power>
-      <colorCode>NONE</colorCode>
-      <shape>Standard</shape>
-    </diylc.passive.Resistor>
-    <diylc.passive.Resistor>
       <name>R10</name>
       <alpha>127</alpha>
       <length value="0.25" unit="in"/>
@@ -1331,7 +1297,7 @@
       <labelOriantation>Directional</labelOriantation>
       <moveLabel>false</moveLabel>
       <hideShortLeads>false</hideShortLeads>
-      <value value="15.0" unit="K"/>
+      <value value="12.0" unit="K"/>
       <power>HALF</power>
       <colorCode>NONE</colorCode>
       <shape>Standard</shape>
@@ -1356,30 +1322,6 @@
       <moveLabel>false</moveLabel>
       <hideShortLeads>false</hideShortLeads>
       <value value="18.0" unit="K"/>
-      <power>HALF</power>
-      <colorCode>NONE</colorCode>
-      <shape>Standard</shape>
-    </diylc.passive.Resistor>
-    <diylc.passive.Resistor>
-      <name>R13</name>
-      <alpha>127</alpha>
-      <length value="0.25" unit="in"/>
-      <width value="0.08" unit="in"/>
-      <points>
-        <point x="9.8" y="5.0"/>
-        <point x="9.8" y="5.3"/>
-        <point x="9.8" y="5.15"/>
-      </points>
-      <bodyColor hex="ffcc99"/>
-      <borderColor hex="996600"/>
-      <labelColor hex="000000"/>
-      <leadColor hex="cccccc"/>
-      <display>VALUE</display>
-      <flipStanding>false</flipStanding>
-      <labelOriantation>Directional</labelOriantation>
-      <moveLabel>false</moveLabel>
-      <hideShortLeads>false</hideShortLeads>
-      <value value="8.2" unit="K"/>
       <power>HALF</power>
       <colorCode>NONE</colorCode>
       <shape>Standard</shape>
@@ -1774,6 +1716,54 @@
       <newScale>6</newScale>
       <sizingMode>TwoPoints</sizingMode>
     </diylc.misc.Image>
+    <diylc.passive.Resistor>
+      <name>R17</name>
+      <alpha>127</alpha>
+      <length value="0.25" unit="in"/>
+      <width value="0.08" unit="in"/>
+      <points>
+        <point x="6.7" y="5.2"/>
+        <point x="6.7" y="4.8"/>
+        <point x="6.7" y="5.0"/>
+      </points>
+      <bodyColor hex="ffcc99"/>
+      <borderColor hex="996600"/>
+      <labelColor hex="000000"/>
+      <leadColor hex="cccccc"/>
+      <display>VALUE</display>
+      <flipStanding>false</flipStanding>
+      <labelOriantation>Directional</labelOriantation>
+      <moveLabel>false</moveLabel>
+      <hideShortLeads>false</hideShortLeads>
+      <value value="470.0" unit="R"/>
+      <power>HALF</power>
+      <colorCode>NONE</colorCode>
+      <shape>Standard</shape>
+    </diylc.passive.Resistor>
+    <diylc.passive.Resistor>
+      <name>R1</name>
+      <alpha>127</alpha>
+      <length value="0.25" unit="in"/>
+      <width value="0.08" unit="in"/>
+      <points>
+        <point x="9.9" y="5.2"/>
+        <point x="9.9" y="4.8"/>
+        <point x="9.9" y="5.0"/>
+      </points>
+      <bodyColor hex="ffcc99"/>
+      <borderColor hex="996600"/>
+      <labelColor hex="000000"/>
+      <leadColor hex="cccccc"/>
+      <display>VALUE</display>
+      <flipStanding>false</flipStanding>
+      <labelOriantation>Directional</labelOriantation>
+      <moveLabel>false</moveLabel>
+      <hideShortLeads>false</hideShortLeads>
+      <value value="470.0" unit="R"/>
+      <power>HALF</power>
+      <colorCode>NONE</colorCode>
+      <shape>Standard</shape>
+    </diylc.passive.Resistor>
     <diylc.connectivity.HookupWire>
       <name>W1</name>
       <alpha>127</alpha>
@@ -1969,16 +1959,6 @@
       <orientation>DEFAULT</orientation>
     </diylc.misc.Label>
     <diylc.misc.Label>
-      <name>LAB7</name>
-      <point x="8.4" y="6.3"/>
-      <text>TODO: test signal in protection diodes irl</text>
-      <font name="Dialog.plain" size="14" style="0"/>
-      <color hex="000000"/>
-      <horizontalAlignment>LEFT</horizontalAlignment>
-      <verticalAlignment>CENTER</verticalAlignment>
-      <orientation>DEFAULT</orientation>
-    </diylc.misc.Label>
-    <diylc.misc.Label>
       <name>LAB8</name>
       <point x="8.3" y="5.5"/>
       <text>GND</text>
@@ -2065,16 +2045,6 @@
       <font name="Dialog.plain" size="14" style="0"/>
       <color hex="000000"/>
       <horizontalAlignment>CENTER</horizontalAlignment>
-      <verticalAlignment>CENTER</verticalAlignment>
-      <orientation>DEFAULT</orientation>
-    </diylc.misc.Label>
-    <diylc.misc.Label>
-      <name>LAB17</name>
-      <point x="8.4" y="6.4"/>
-      <text>TODO: remove 8.2k resistors?</text>
-      <font name="Dialog.plain" size="14" style="0"/>
-      <color hex="000000"/>
-      <horizontalAlignment>LEFT</horizontalAlignment>
       <verticalAlignment>CENTER</verticalAlignment>
       <orientation>DEFAULT</orientation>
     </diylc.misc.Label>
