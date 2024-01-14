@@ -31,16 +31,15 @@ The other half is similar.
 
 At a high-level, my circuit:
 - removes any DC offset from the headphones signal (this seems to be unnecessary, but doesn't hurt)
+- clamps the input voltage between +-0.7V using diodes
 - amplifies the input by 100x and stores the amplified max voltage into a capacitor
 - uses a transistor connected as a voltage follower to drive the AliExpress current meter
 - uses transistors to drive red or yellow LEDs (or both),
     depending on whether we are showing a value near 100%,
     using [this transistor trick](https://electronics.stackexchange.com/q/164068).
 
-I used BC549C transistors and a UA798TC dual op-amp,
+I used 1N4148 diodes, BC549C transistors and a UA798TC dual op-amp,
 because I already had them.
-With small modifications, you can use whatever parts are available to you.
-Also, the resistor values don't need to match mine exactly.
 
 The op-amp's output must go near the ground.
 With no input signal, my dual op-amp charges the 100nF capacitor to 270mV on one side and 400mV on the other side.
@@ -50,13 +49,19 @@ so it would be impossible to make the meter go to zero.
 
 The UA798TC doesn't swing all the way to +5V, but it doesn't matter.
 For example, at 3.7V, the meter will surely hit its maximum,
-because there is enough voltage to
-go through the diode (0.6V), turn on the transistor (0.6V)
-and drive 5mA through the 500 Ohm resistor (2.5V).
+because even with a 0.7V diode drop in the transistor's base-emitter junction,
+we would get `3V / 470ohm ≈ 6.3mA` through the current meter.
+
+The 100nF capacitor discharges quite quickly
+depending on the current gain (hFE) of the transistors.
+Practically this means that the meters tend to show a lower value than you would expect.
+Usually anything that depends on the current gain is considered bad design,
+but in this case I think it's fine, because it's easy to work around in software:
+I could use a higher frequency, or I can just send larger signals to compensate.
 
 The small 1k "resistor" represents the op-amp's internal output resistance.
-The output resistance of my op-amp seems to be much smaller than 1k,
-but I used 1k in the simulation to make sure it will work.
+The datasheet says that the output resistance of a UA798TC is typically 800ohm,
+but doesn't specify minimum or maximum values.
 
 
 ## Software Setup
@@ -81,9 +86,12 @@ The GUI looks like this:
 ![config GUI](config-screenshot.png)
 
 Each slider sets the audio volume used to move the meter to a given position.
+As you hover or drag the sliders, the meter shows the value set by the slider,
+so that you know where the slider should be.
+
 Linear interpolation is used.
 For example, to move the meter to 65%,
-the software will play audio with half the volume set by the 60% and 70% sliders.
+the software will play audio whose volume is the average of the 60% and 70% sliders.
 
 Once configured, you can start displaying CPU and memory usage:
 
