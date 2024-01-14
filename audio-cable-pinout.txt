@@ -1,0 +1,4 @@
+tip = green
+ring near tip = red
+ring near sleeve = white
+sleeve = shielding
