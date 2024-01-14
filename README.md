@@ -54,9 +54,9 @@ because the transistor that drives the current meter would never turn off,
 so it would be impossible to make the meter go to zero.
 
 The UA798TC doesn't swing all the way to +5V, but it doesn't matter.
-For example, at 3.7V, the meter will surely hit its maximum,
-because even with a 0.7V diode drop in the transistor's base-emitter junction,
-we would get `3V / 470ohm ≈ 6.3mA` through the current meter.
+For example, at 4V, the meter will surely hit its maximum,
+because even with 0.7V diode drops in the transistor's base-emitter junction,
+we would get `(4V - 2*0.7V) / 470ohm ≈ 5.5mA` through the current meter.
 
 The 100nF capacitor discharges quite quickly
 depending on the current gain (hFE) of the transistors.
