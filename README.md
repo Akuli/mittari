@@ -34,7 +34,7 @@ copy the file's content and paste them to "Import from Text" in circuitjs.
 
 At a high-level, my circuit:
 - removes any DC offset from the headphones signal
-- clamps the input voltage between +-0.7V using diodes to protect the op-amp
+- clamps the input voltage between about +-0.7V to protect the op-amp
 - amplifies the input by 100x and stores the amplified max voltage into a capacitor
 - uses a transistor connected as a voltage follower to drive the AliExpress current meter
 - uses transistors to drive red or yellow LEDs (or both),
