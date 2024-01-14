@@ -27,16 +27,22 @@ The other half is similar.
 
 ![circuit diagram](circuit.png)
 
-[Click here to open the circuit in CircuitJS.](https://www.falstad.com/circuit/circuitjs.html?ctz=CQAgjCAMB0l3BWEB2aA2MBOZAOBaFkAmbSQkBSCkAFgGYKBTAWjDACgAlEZuo8ZGh5oaAoVQhh4UWHRpIqi6AnYBjHnzHghYQVHCx4R43DAtkPGPDSZItsHWR06aRy4WGOAJ21awQoiJRKnx4dgBzX0DRfxAgxSh2AEMQEW0JGhi0KhxaaGDwExlIOhKcZGIaIhsRBAdLWCD5PDAabHlIHDoEBikjdgB3VJi9WN1xdh80zB1MkBn9MBx+qdEFqnXwZcgI-U22fkVB4fA56Ymh1rWdTH519gATdOesfn8qfgfGADMkgFcADYAFzU4FuL3B0UW5hAdFgNneYDqRDkSNwxUgHEirziQTB-Hi+h2l3B73x8wu5LJRHwzx2QLitJpQlKomZix4YGgmFKXUwOBo5QIAsCMlcIjkPTgmBoaC6QkoVC+v0BIO4rLiNCoGpxCS11ASMBUPg1RGIsMgoj4CUV7Ec2stsKIDqtcvARN2GpcuS9Ao9Q3Z1KZtOJjJ02VhCDeEaIXFommW8f4mj1ISJMhUDJoYwjsqyCQgzBg9BlMzQBFciuzYrlaCIOEw-KWkCCbAocBAyv+wPY-n4UdyiYH4DABM7P27QOYAMYTwgMHExQ4DJEEgjw7JEgaeEgTgcSKCCAQbVyRtsLf5RFeyFlOH7Ha7quOea0bR0elDb60G4-k1oC3Gf8An1CRnV2L9CQgkNEiGF9Ey-RNPwWId6xARC-2zcNtSjOk0OdHY+woCMhwjA44nHFVgWnWd3QXIlYA4QiEHBIdSVHcjHyomc5zFejMWODd2NCEdDgE0ihLY0ShmY-gSJyI5pOIkJUPQ6TUKuCh1PYgi61oNJ4LSMjPgnVVqJ4w0GN7XT6FkqgbJEjiTK4mj5z4jhYITOz9IUpMHJfMjP0M9j-LmUMZLQqhVwixIfDJOK5k3Qo4D-KLEyixKkTCVY10i-VnVPLYwkiKL8uGD48SOAAPWgzgYOULHLWhwCQIgADUAB0AGdOr+AAHRgvC6gAjLwAEtwgACyBLqvFnLqkgAOweLqAE9GABAEAHsBi6gAZABRAARTr2Gqgg4kgHRSguzAmqREAAFUAEFkH5AAVABhU6LRa49YQwRkLBiJAACEPuPTAvuq7M3gbPTchxYGQDBiGoc0mI4YQRNEea5HwbaL7Nv0ArRxIbV8hwfwqkoGUbF3RqrFMfQFFhU5WdFcrYXYImsDQxZun8W7GcxJcSmwUpnDIHldIgN5broO0CoAMVcpQyE5EBWs24EknCRh2CAA)
+The repository contains [a circuitjs file](./mittari.circuitjs.txt)
+that you can open with [circuitjs](https://www.falstad.com/circuit/circuitjs.html).
+Alternatively, if you don't want to clone this repository,
+copy the file's content and paste them to "Import from Text" in circuitjs.
 
 At a high-level, my circuit:
-- removes any DC offset from the headphones signal (this seems to be unnecessary, but doesn't hurt)
-- clamps the input voltage between +-0.7V using diodes
+- removes any DC offset from the headphones signal
+- clamps the input voltage between +-0.7V using diodes to protect the op-amp
 - amplifies the input by 100x and stores the amplified max voltage into a capacitor
 - uses a transistor connected as a voltage follower to drive the AliExpress current meter
 - uses transistors to drive red or yellow LEDs (or both),
     depending on whether we are showing a value near 100%,
     using [this transistor trick](https://electronics.stackexchange.com/q/164068).
+
+The first two steps are unnecessary if everything is working as intended,
+but they protect the computer and the op-amp chip in case something goes wrong.
 
 I used 1N4148 diodes, BC549C transistors and a UA798TC dual op-amp,
 because I already had them.
