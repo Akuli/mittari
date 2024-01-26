@@ -1,6 +1,6 @@
 # Mittari
 
-TODO: video of the thing working
+https://github.com/Akuli/mittari/assets/18505570/467ddbf9-522e-461b-a0d6-3eb654f96346
 
 This project is an analog CPU and RAM meter for my computer.
 The idea is taken from [this youtube video](https://www.youtube.com/watch?v=4J-DTbZlJ5I).
