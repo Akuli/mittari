@@ -1,6 +1,6 @@
 # Mittari
 
-TODO: picture of device outside
+TODO: video of the thing working
 
 This project is an analog CPU and RAM meter for my computer.
 The idea is taken from [this youtube video](https://www.youtube.com/watch?v=4J-DTbZlJ5I).
@@ -16,8 +16,21 @@ I conveniently get two channels (left and right) that I can use for the two mete
 This does mean that if I connect my headphones to the wrong place,
 I will hear a 1kHz sine wave.
 
-The actual meters are [this product from AliExpress](https://www.aliexpress.com/item/1005004735059319.html).
-I used the 5mA version.
+
+## Meters
+
+![picture of meters](images/meters.jpg)
+
+(Apparently they make current meters by adding a resistor to a voltage meter)
+
+The meters are [this product from AliExpress](https://www.aliexpress.com/item/1005004735059319.html).
+I used the 5mA version, so that the meters would consume much less current
+than the 500mA limit of USB 2.0.
+
+I am planning to scan the original mA scale with a scanner,
+and then print custom scales onto paper and attach them on top of the original scale.
+My custom scales will go from 0% to 100% instead of 0mA to 5mA,
+and I will label them `CPU` and `RAM` instead of `mA`.
 
 
 ## Woodworking
@@ -48,18 +61,19 @@ and the other end is for the USB sound card.
 Doing this with USB 2.0 is super easy,
 because USB 2.0 only has 4 pins: +5V, ground, and two data pins (D+ and D-).
 
-The other end of the cable is one half of a fuse holder.
-I am using a fast-blowing 315mA fuse, because it works and I already had it.
+The black thingy at the end of the red cable is one half of
+[this fuse holder that I already had](https://www.biltema.fi/en-fi/car---mc/electrical-system/fuses/line-fuse-holder-5-x-20-mm-2000048666).
+I am using a fast 315mA fuse, because it works and I already had it.
 I also tried a 63mA fuse, because the circuit seems to consume less than 50mA,
 but it added too much resistance and the meters did not go all the way to 100%.
 
 
 ## USB Sound Card
 
+![picture of sound card](images/usb-sound-card.jpg)
+
 I got this a long time ago (maybe 10 years). I don't remember why or where.
 AliExpress sells very similar USB sound cards for about 2 euros each (includes shipping).
-
-![picture of sound card](images/usb-sound-card.jpg)
 
 
 ## Circuit Board
@@ -78,6 +92,7 @@ I ended up with a couple millimeters between the angle brackets and LED legs.
 
 The audio cable is taken from cheap and broken earbuds.
 The wires are covered in some kind of colorful insulation stuff that makes them difficult to solder.
+It seems to burn away with a high temperature (I think I used 370-400 celsius) and a lot of time (15+ seconds).
 
 The `layout.diy` file in this repo is a [DIY Layout Creator](https://diy-fever.com/software/diylc/) drawing of the board.
 
@@ -113,30 +128,30 @@ Here is a walk-through of the circuit:
 - The 100nF cap after the op-amp remembers the maximum voltage of the input signal.
     For some reason, my 100nF caps get 270mV on one channel and 400mV on the other channel
     when there is no audio coming in.
-    I'm not sure why that happens, but that doesn't really matter
+    I'm not sure why that happens, but it doesn't really matter
     as long as these weird voltages aren't enough to turn on the transistors.
     With a 1kHz input signal, these capacitors need to remember the voltage accurately enough for about 1ms.
     Because the current gain of a BC549C transistor is about 500,
     and because the LEDs and the meter only consume about `20mA + 5mA`,
     the capacitor discharges with current `25mA / 500 = 50uA`.
     In one millisecond, the voltage changes by about `1/C ∫ I dt = (50uA * 1ms) / 100nF = 0.5V`.
-    This sounds bad, but it's easy to compensate for inaccuracies in software.
+    This sounds bad, but I just compensate for this (and other inaccuracies) in software.
     I could use a bigger cap or a higher frequency,
     but I had lots of 100nF caps and I wanted to use them,
     and 1kHz seems to work fine.
 - The current meter (bottom of picture) is driven through a BC549C transistor,
     connected as a voltage follower, and a 470 ohm resistor.
-    This means the meter maxes out
+    The meter displays its maximum value of 5mA
     when the transistor gets an average voltage of `470ohm * 5mA + 0.6V ≈ 3V` at its base.
-    In practice, this voltage will bounce very quickly between about 2.75V and 3.25V because of the 0.5V discharging.
-    This doesn't matter, because the meter isn't fast enough to move along with it.
+    In practice, this voltage will bounce between about 2.75V and 3.25V because of the 0.5V discharging.
+    This doesn't matter, because the meter isn't fast enough to move along with the varying voltage.
 - The LED transistors use [this transistor trick](https://electronics.stackexchange.com/q/164068)
     to turn on either yellow or red LEDs depending on the voltage.
     The two transistors basically act as a comparator,
     comparing the output of the op-amp to `18k / (12k + 18k) = 3V`
     given by the voltage divider on the right.
-    The red LEDs begin to turn on when the meter is displaying 80%,
-    and there's almost no yellow light at 100%.
+    The red LEDs begin to turn at about 80%,
+    and there's almost no yellow light when a meter is displaying 100%.
 
 
 ## Supported operating system
@@ -156,11 +171,11 @@ If I added Windows or MacOS support, it would probably be broken most of the tim
 
 I made an ugly but useful tkinter GUI mostly to compensate for electronics inaccuracies in software.
 There are several inaccuracies:
-- Transistors need about 0.6V to 0.7V to turn on.
+- Transistors need about 0.6V to turn on.
 - The AliExpress current meters are inaccurate.
 - The circuit depends on the current gain (beta) of the transistors.
 
-But none of this matters, as long as the software can output the correct audio volumes
+But none of this matters if the software can output the correct audio volumes
 to set the meters to the right places.
 
 Each slider sets the audio volume used to move the meter to a given position.
