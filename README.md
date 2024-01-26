@@ -150,7 +150,7 @@ Here is a walk-through of the circuit:
     The two transistors basically act as a comparator,
     comparing the output of the op-amp to `18k / (12k + 18k) = 3V`
     given by the voltage divider on the right.
-    The red LEDs begin to turn at about 80%,
+    The red LEDs begin to turn at about 75%,
     and there's almost no yellow light when a meter is displaying 100%.
 
 
