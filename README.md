@@ -56,12 +56,13 @@ I widened the meter holes by about 1mm in the direction across the grain.
 
 I took the shortest USB 2.0 extension cord I found, sliced it open,
 and soldered more wires onto it to get 5V power.
+Doing this with USB 2.0 is super easy, because USB 2.0 cords have only 4 wires inside:
++5V (red), ground (black), and two data pins (D+ and D-).
+
 I used a lot of shrink tube, because I don't want to break my computer by accidentally shorting these.
 
 One end of the extension cord plugs into my computer (through a longer extension cord),
 and the other end is for the USB sound card.
-Doing this with USB 2.0 is super easy,
-because USB 2.0 only has 4 pins: +5V, ground, and two data pins (D+ and D-).
 
 The black thingy at the end of the red cable is one half of
 [this fuse holder that I already had](https://www.biltema.fi/en-fi/car---mc/electrical-system/fuses/line-fuse-holder-5-x-20-mm-2000048666).
@@ -74,7 +75,7 @@ but it added too much resistance and the meters did not go all the way to 100%.
 
 ![picture of sound card](images/usb-sound-card.jpg)
 
-I got this a long time ago (maybe 10 years). I don't remember why or where.
+I got this about 10 years ago. I don't remember why or where.
 AliExpress sells very similar USB sound cards for about 2 euros each (includes shipping).
 
 
@@ -82,12 +83,16 @@ AliExpress sells very similar USB sound cards for about 2 euros each (includes s
 
 ![picture of circuit board](images/board.jpg)
 
-I assembled this board using almost nothing but components that I already had.
+The board itself is [stripboard](https://en.wikipedia.org/wiki/Stripboard).
+The black marks indicate where I cut the strips of copper on the other side.
+
+I assembled this board almost entirely out of components I already had.
 I think I only bought super-bright red LEDs.
 The thing with a thick red cable is the other half of the fuse holder.
 
-The outermost LED legs have shrink tube around them.
-In hindsight, this is completely unnecessary.
+Each row of LEDs is yellow-red-yellow-red-yellow,
+and the LEDs are aimed at the meters.
+In hindsight, the black shrink tube around outermost LED legs is unnecessary.
 I thought they would prevent the LED legs from touching the angle brackets that hold the board,
 but when assembling this,
 I ended up with a couple millimeters between the angle brackets and LED legs.
@@ -105,7 +110,7 @@ The `layout.diy` file in this repo is a [DIY Layout Creator](https://diy-fever.c
 
 I designed an analog circuit to drive the meters and LEDs,
 because I haven't yet learned to throw a microcontroller at every electronics problem.
-Here is **one half** of the circuit, enough to drive one meter.
+Here is **one half** of the circuit, enough to drive one meter and one row of LEDs.
 The other half is similar.
 
 The repository contains [a circuitjs file](./mittari.circuitjs.txt)
@@ -150,7 +155,7 @@ Here is a walk-through of the circuit:
 - The LED transistors use [this transistor trick](https://electronics.stackexchange.com/q/164068)
     to turn on either yellow or red LEDs depending on the voltage.
     The two transistors basically act as a comparator,
-    comparing the output of the op-amp to `18k / (12k + 18k) = 3V`
+    comparing the output of the op-amp to `18k/(12k+18k) * 5V = 3V`
     given by the voltage divider on the right.
     The red LEDs begin to turn at about 75%,
     and there's almost no yellow light when a meter is displaying 100%.
@@ -183,8 +188,8 @@ to set the meters to the right places.
 Each slider sets the audio volume used to move the meter to a given position.
 For example, the 20% sliders should be adjusted so that the meter displays 20%
 when that slider is hovered.
-Then, to display a value like 27%, the software will compute a weighted average
-of the positions of the 20% and 30% sliders.
+Then, to display a value like 27%, the software will output a sine wave
+whose volume is a weighted average of the positions of the 20% and 30% sliders.
 In other words, it uses linear interpolation.
 As you hover or drag the sliders, the meter shows the value set by the slider,
 so that you know where the slider should be.
