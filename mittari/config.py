@@ -7,7 +7,7 @@ from typing import Any
 # The hardware has room for systems that output a quiet signal from headphones
 # jack. Exposing it unnecessarily makes the sliders annoyingly sensitive,
 # because only a short section in the beginning of the slider is usable.
-MAX_GAIN = 0.02
+MAX_GAIN = 0.1
 
 
 class Config:
