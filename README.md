@@ -3,10 +3,12 @@
 https://github.com/Akuli/mittari/assets/18505570/467ddbf9-522e-461b-a0d6-3eb654f96346
 
 This project is an analog CPU and RAM meter for my computer.
-The idea is taken from [this youtube video](https://www.youtube.com/watch?v=4J-DTbZlJ5I).
+The left meter is for CPU usage and the right is for RAM.
 It involves woodworking, electronics, analog audio, digital audio, Python, tkinter, C, and a few other things.
 
 ![picture of internals](images/internals-high-level.jpg)
+
+The idea is taken from [this youtube video](https://www.youtube.com/watch?v=4J-DTbZlJ5I).
 
 The meters are controlled by sending audio out through a USB sound card:
 a louder audio makes a meter display a bigger value.
