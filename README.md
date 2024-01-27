@@ -232,11 +232,10 @@ $ ./mittari my-mittari-config.conf
 I originally wrote this part in Python,
 but I rewrote it in C because the Python version always consumed a couple percent of CPU.
 
-The C program is quite simple, in principle.
-It spawns an `aplay` subprocess and then feeds audio data to its stdin in chunks of 0.1 seconds.
-(The 0.1 can be changed by editing the config file manually.)
+The C program spawns an `aplay` subprocess and then feeds audio data to its stdin in chunks of 0.1 seconds.
+The 0.1 can be changed by editing the config file manually.
 
-I made sure to properly handle situations where `aplay` or my C program lag:
+I made sure to handle situations where `aplay` or my C program lag:
 - If my C program lags, `aplay` will stop playing for a moment and print a warning.
     This is fine, but unlikely to ever happen in practice.
     My C program only writes a chunk of audio data every 0.1 seconds,
@@ -244,16 +243,29 @@ I made sure to properly handle situations where `aplay` or my C program lag:
 - If `aplay` lags, my C program will get stuck at writing data to its stdin until the lag is over.
     To ensure that this happens, I
     [set the pipe buffer size as small as possible](https://stackoverflow.com/a/14371183).
+    This is important, because if my C program is allowed to just write more stuff,
+    it can write several seconds of audio data while `aplay` is stuck,
+    and once `aplay` is a few seconds behind,
+    the meters update with a few seconds of lag.
 
-When timing the 0.1 seconds, I made sure to take into account the time spent in lags:
-- If the C program spends 0.01 seconds between two sleeps,
-    then the second sleep will be 0.09 seconds instead of 0.1 seconds
+I also take lags into account when timing the 0.1 seconds:
+- Time between the sleeps is subtracted from the sleep time,
+    so if the C program spends 0.01 seconds doing something between two sleeps,
+    then the second sleep will be 0.09 seconds instead of 0.1 seconds.
 - If the C program spends more than 0.1 seconds between two sleeps,
     then the second sleep is skipped entirely.
 
-The SIGSTOP and SIGCONT signals are useful for testing the lag:
+I used the SIGSTOP and SIGCONT signals to test how lags are handled:
 
 ```
 $ pkill -STOP aplay
 $ pkill -CONT aplay
+$ pkill -STOP mittari
+$ pkill -CONT mittari
+```
+
+After causing lags, I started and stopped an infinite loop to see how quickly the CPU usage updates:
+
+```
+$ while true; do :; done
 ```
