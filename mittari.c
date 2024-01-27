@@ -77,7 +77,7 @@ static float get_ram_usage(void)
 {
     FILE *f = fopen("/proc/meminfo", "r");
     if (!f) {
-        show_warning("failed to open /proc/stat: %s", strerror(errno));
+        show_warning("failed to open /proc/meminfo: %s", strerror(errno));
         return 0;
     }
 
