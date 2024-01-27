@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#define _GNU_SOURCE  // needed only for adjusting pipe size https://stackoverflow.com/a/25463268
 
 #include <assert.h>
 #include <math.h>
@@ -13,14 +14,10 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
-#define show_warning(...) ( fprintf(stderr, "Warning: "), fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n") )
-#define fail(...) ( fprintf(stderr, "Error: "),   fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n"), exit(1) )
-
-static struct CpuStats {
-    long long total_since_boot;
-    long long idle_since_boot;
-} last_cpu_stats = {-1,-1};
+#define show_warning(...) ( fprintf(stderr, "mittari warning: "), fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n") )
+#define fail(...) ( fprintf(stderr, "mittari error: "),   fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n"), exit(1) )
 
 
 /* Returns the cpu usage as a fraction between 0 and 1.
@@ -54,12 +51,18 @@ static float get_cpu_usage(void)
         return 0;
     }
 
-    struct CpuStats prev = last_cpu_stats;
-    struct CpuStats cur = {
+    struct Stats {
+        long long total_since_boot;
+        long long idle_since_boot;
+    };
+    static struct Stats last_stats = {-1,-1};
+
+    struct Stats prev = last_stats;
+    struct Stats cur = {
         .total_since_boot = user_field+nice_field+system_field+idle_field+iowait_field,
         .idle_since_boot = idle_field+iowait_field,
     };
-    last_cpu_stats = cur;
+    last_stats = cur;
 
     if (prev.total_since_boot == -1 || prev.total_since_boot == cur.total_since_boot) {
         return 0;
@@ -365,6 +368,15 @@ static struct Process start_aplay(const struct Config *conf)
     if (pipe(stdin_pipe) != 0) {
         fail("pipe() failed");
     }
+
+    /*
+    Set pipe size as small as possible, so that if aplay lags, we get stuck waiting
+    for it, instead of queueing up a lot of audio and causing more lagginess.
+
+    The smallest possible pipe size is the page size (4096)
+    https://stackoverflow.com/a/14371183
+    */
+    fcntl(stdin_pipe[1], F_SETPIPE_SZ, getpagesize());
 
     posix_spawn_file_actions_t actions;
     posix_spawn_file_actions_init(&actions);
