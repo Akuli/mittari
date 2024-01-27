@@ -11,6 +11,8 @@
 #include <spawn.h>
 #include <errno.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 #define show_warning(...) ( fprintf(stderr, "Warning: "), fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n") )
 #define fail(...) ( fprintf(stderr, "Error: "),   fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n"), exit(1) )
@@ -45,6 +47,8 @@ static float get_cpu_usage(void)
             break;
         }
     }
+    fclose(f);
+
     if (!found) {
         show_warning("failed to find 'cpu ' line in /proc/stat");
         return 0;
@@ -87,6 +91,7 @@ static float get_ram_usage(void)
         sscanf(line, "MemTotal: %lld kB", &total);
         sscanf(line, "MemAvailable: %lld kB", &available);
     }
+    fclose(f);
 
     if (total == -1 || available == -1) {
         show_warning("failed to parse /proc/meminfo");
@@ -425,6 +430,11 @@ static struct timespec subtract_timespecs(const struct timespec *a, const struct
     return (struct timespec){ .tv_sec=sec, .tv_nsec=nanosec };
 }
 
+static struct timespec negate_timespec(const struct timespec *t)
+{
+    return subtract_timespecs(&(struct timespec){0}, t);
+}
+
 static bool timespec_is_negative(const struct timespec *t)
 {
     assert(0 <= t->tv_nsec && t->tv_nsec < one_sec_as_nanosec);
@@ -447,8 +457,9 @@ static void wait_given_interval(struct timespec *t, float interval)
     struct timespec wait_time = subtract_timespecs(t, &now);
     if (timespec_is_negative(&wait_time)) {
         // we are lagging behind, skip waiting
-        show_warning("lag");
         *t = now;
+        struct timespec lag = negate_timespec(&wait_time);
+        show_warning("lagged %d.%09ld seconds", (int)lag.tv_sec, (long)lag.tv_nsec);
     } else {
         nanosleep(&wait_time, NULL);
     }
@@ -476,6 +487,10 @@ int main(int argc, char **argv)
         return 2;
     }
 
+    // Ignore SIGPIPE signal, so I can handle aplay problems myself.
+    // This process gets SIGPIPE when aplay dies.
+    signal(SIGPIPE, SIG_IGN);
+
     struct Config conf;
     read_config_file(argv[1], &conf);
 
@@ -488,10 +503,13 @@ int main(int argc, char **argv)
     while(true) {
         prepare_audio_data(&conf, audio_data, samples_per_channel);
         if (write_all(aplay.stdin_fd, audio_data, 2 * samples_per_channel * sizeof(audio_data[0])) != 0) {
-            // TODO handle aplay error
-            printf("WUTWUT\n");
-            fflush(stdout);
-            assert(false);
+            show_warning("there seems to be a problem with aplay, restarting in 1 second");
+
+            kill(aplay.pid, SIGKILL);
+            waitpid(aplay.pid, NULL, 0);
+
+            nanosleep(&(struct timespec){ .tv_sec = 1 }, NULL);
+            aplay = start_aplay(&conf);
         }
         wait_given_interval(&wait_state, conf.refresh_interval);
     }
