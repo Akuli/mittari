@@ -1,4 +1,5 @@
 import re
+import json
 import copy
 import sys
 import time
@@ -17,19 +18,6 @@ from math import sin, pi
 # jack. Exposing it unnecessarily makes the sliders annoyingly sensitive,
 # because only a short section in the beginning of the slider is usable.
 MAX_GAIN = 0.1
-
-
-def calibration_list_to_string(values: list[float]) -> str:
-    assert len(values) == 11  # 0%, 10%, 20%, ..., 100%
-
-    # g produces a good precision, not very long and not noticeably rounded
-    return ",".join(f"{value:g}" for value in values)
-
-
-def calibration_list_from_string(string: str) -> list[float]:
-    values = [float(value) for value in string.split(',')]
-    assert len(values) == 11  # 0%, 10%, 20%, ..., 100%
-    return values
 
 
 class ChannelConfig(TypedDict):
@@ -85,25 +73,17 @@ def load_config(path: Path) -> Config:
                 current_section = result[section_name]  # type: ignore
                 continue
 
-            match = re.fullmatch(r'([\w.]+) *= *"(.*)"', line)
+            match = re.fullmatch(r'(\w+) *= *(.*)', line)
             if match is None:
                 # TODO: test
                 print(f"Warning: line {lineno} of config file contains invalid syntax")
                 continue
 
             key, value = match.groups()
-
-            if key == "calibration":
-                value = calibration_list_from_string(value)
-            elif key in ("sample_rate", "frequency"):
-                value = int(value)
-            elif key == "refresh_interval":
-                value = float(value)
-
             if key not in current_section:
                 # TODO: test
                 print(f"Warning: line {lineno} of config file contains an unknown key {key!r}")
-            current_section[key] = value
+            current_section[key] = json.loads(value)
 
     return result  # type: ignore
 
@@ -115,11 +95,9 @@ def save_config(config: Config, path: Path) -> None:
             if isinstance(value, dict):
                 file.write(f"{key}:\n")
                 for subkey, subvalue in value.items():
-                    if subkey == "calibration":
-                        subvalue = calibration_list_to_string(subvalue)
-                    file.write(f'    {subkey} = "{subvalue}"\n')
+                    file.write(f'    {subkey} = {json.dumps(subvalue)}\n')
             else:
-                file.write(f'{key} = "{value}"\n')
+                file.write(f'{key} = {json.dumps(value)}\n')
 
 
 def list_audio_devices() -> list[str]:
@@ -300,7 +278,8 @@ class ConfigGUI:
         return container
 
     def on_slider_moved(self, channel: Literal["left", "right"], percentage: int, new_value: str) -> None:
-        self.config[channel]["calibration"][percentage // 10] = float(new_value) / 100 * MAX_GAIN
+        gain = float(new_value) / 100 * MAX_GAIN
+        self.config[channel]["calibration"][percentage // 10] = round(gain, 8)
         self.player.play_single_channel(channel, percentage)
 
     def create_meter_configurator(
