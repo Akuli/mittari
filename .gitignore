@@ -3,3 +3,7 @@ __pycache__
 
 # libreoffice lock files
 .~lock.*
+
+# C program
+mittari
+mittari.o

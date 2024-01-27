@@ -176,11 +176,13 @@ If I added Windows or MacOS support, it would probably be broken most of the tim
 
 ![config GUI](images/config-screenshot.png)
 
-I made an ugly but useful tkinter GUI mostly to compensate for electronics inaccuracies in software.
+I made an ugly but useful Python script with a tkinter GUI.
+The main purpose is compensating for electronics inaccuracies in software.
 There are several inaccuracies:
 - Transistors need about 0.6V to turn on.
 - The AliExpress current meters are inaccurate.
 - The circuit depends on the current gain (beta) of the transistors.
+- I used +-5% resistors and capacitors, and also a couple +-10% capacitors.
 
 But none of this matters if the software can output the correct audio volumes
 to set the meters to the right places.
@@ -194,30 +196,76 @@ In other words, it uses linear interpolation.
 As you hover or drag the sliders, the meter shows the value set by the slider,
 so that you know where the slider should be.
 
-Running the GUI:
+Running the config script:
 
 ```
 $ sudo apt install python3-tk
-$ python3 -m mittari config
+$ python3 config.py my-mittari-config.conf
 ```
 
-If you want to develop the software, you should probably start with these commands:
+Here `my-mittari-config.conf` is the name of a config file
+that is in a completely non-standard format.
+It will be created if it doesn't exist.
+The repository contains [example-config.conf](./example-config.conf),
+so you can get an idea of what a config file looks like without running anything.
+
+Developing the config script:
 
 ```
-$ python3 -m venv
+$ python3 -m venv env
 $ source env/bin/activate
 $ pip install -r requirements-dev.txt
-$ mypy mittari          # type checker
+$ mypy config.py        # type checker
 $ python3 -m pytest     # run tests
 ```
 
 
 ## C
 
-(This part is currently written in Python, but I'm planning to rewrite it in C for better performance)
-
-Once configured, I can start displaying CPU and memory usage:
+Once I have a config file, I run a C program to display my CPU and memory usage:
 
 ```
-$ python3 -m mittari
+$ make
+$ ./mittari my-mittari-config.conf
+```
+
+I originally wrote this part in Python,
+but I rewrote it in C because the Python version always consumed a couple percent of CPU.
+
+The C program spawns an `aplay` subprocess and then feeds audio data to its stdin in chunks of 0.1 seconds.
+The 0.1 can be changed by editing the config file manually.
+
+I made sure to handle situations where `aplay` or my C program lag:
+- If my C program lags, `aplay` will stop playing for a moment and print a warning.
+    This is fine, but unlikely to ever happen in practice.
+    My C program only writes a chunk of audio data every 0.1 seconds,
+    so it is idle most of the time.
+- If `aplay` lags, my C program will get stuck at writing data to its stdin until the lag is over.
+    To ensure that this happens, I
+    [set the pipe buffer size as small as possible](https://stackoverflow.com/a/14371183).
+    This is important, because if my C program is allowed to just write more stuff,
+    it can write several seconds of audio data while `aplay` is stuck,
+    and once `aplay` is a few seconds behind,
+    the meters update with a few seconds of lag.
+
+I also take lags into account when timing the 0.1 seconds:
+- Time between the sleeps is subtracted from the sleep time,
+    so if the C program spends 0.01 seconds doing something between two sleeps,
+    then the second sleep will be 0.09 seconds instead of 0.1 seconds.
+- If the C program spends more than 0.1 seconds between two sleeps,
+    then the second sleep is skipped entirely.
+
+I used the SIGSTOP and SIGCONT signals to test how lags are handled:
+
+```
+$ pkill -STOP aplay
+$ pkill -CONT aplay
+$ pkill -STOP mittari
+$ pkill -CONT mittari
+```
+
+After causing lags, I started and stopped an infinite loop to see how quickly the CPU usage updates:
+
+```
+$ while true; do :; done
 ```
