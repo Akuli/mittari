@@ -95,6 +95,10 @@ def load_config(path: Path) -> Config:
 
             if key == "calibration":
                 value = calibration_list_from_string(value)
+            elif key in ("sample_rate", "frequency"):
+                value = int(value)
+            elif key == "refresh_interval":
+                value = float(value)
 
             if key not in current_section:
                 # TODO: test
@@ -375,29 +379,35 @@ def main() -> None:
 
     player = AudioPlayer(config)
     player.start()
+    try:
+        root = tkinter.Tk()
+        root.title(f"Mittari Configurator: {config_path.name}")
+        root.minsize(700, 500)
 
-    root = tkinter.Tk()
-    root.title(f"Mittari Configurator: {config_path.name}")
-    root.minsize(700, 500)
+        big_frame = ttk.Frame(root)
+        big_frame.pack(fill="both", expand=True)
 
-    big_frame = ttk.Frame(root)
-    big_frame.pack(fill="both", expand=True)
+        gui = ConfigGUI(big_frame, player)
 
-    gui = ConfigGUI(big_frame, player)
+        ttk.Separator(root).pack(fill="x")
 
-    ttk.Separator(root).pack(fill="x")
+        button_frame = ttk.Frame(root)
+        button_frame.pack(fill="x")
 
-    button_frame = ttk.Frame(root)
-    button_frame.pack(fill="x")
+        ok_button = ttk.Button(button_frame, text="Save and Exit", command=gui.save_and_exit)
+        cancel_button = ttk.Button(button_frame, text="Cancel", command=root.destroy)
 
-    ok_button = ttk.Button(button_frame, text="Save and Exit", command=gui.save_and_exit)
-    cancel_button = ttk.Button(button_frame, text="Cancel", command=root.destroy)
+        ok_button.pack(side="right", padx=5, pady=5)
+        cancel_button.pack(side="right", padx=5, pady=5)
 
-    ok_button.pack(side="right", padx=5, pady=5)
-    cancel_button.pack(side="right", padx=5, pady=5)
+        root.protocol("WM_DELETE_WINDOW", gui.maybe_save_and_exit)
+        root.mainloop()
 
-    root.protocol("WM_DELETE_WINDOW", (lambda: gui.maybe_save_and_exit))
-    root.mainloop()
+        if gui.user_wants_to_save:
+            save_config(config, config_path)
+
+    finally:
+        player.stop_everything()
 
 
 if __name__ == "__main__":
