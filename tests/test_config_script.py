@@ -1,4 +1,7 @@
+from shutil import which
 from pathlib import Path
+
+import pytest
 
 from config import (
     list_audio_devices,
@@ -9,6 +12,7 @@ from config import (
 )
 
 
+@pytest.mark.skipif(which("aplay") is None, reason="uses 'aplay -L'")
 def test_listing_audio_devices():
     device_names = list_audio_devices()
     assert len(device_names) >= 10

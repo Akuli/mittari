@@ -199,7 +199,7 @@ so that you know where the slider should be.
 Running the config script:
 
 ```
-$ sudo apt install python3-tk
+$ sudo apt install python3-tk alsa-utils
 $ python3 config.py my-mittari-config.conf
 ```
 
@@ -225,6 +225,7 @@ $ python3 -m pytest     # run tests
 Once I have a config file, I run a C program to display my CPU and memory usage:
 
 ```
+$ sudo apt install gcc make
 $ make
 $ ./mittari my-mittari-config.conf
 ```
