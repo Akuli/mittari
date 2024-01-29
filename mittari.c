@@ -157,16 +157,16 @@ static bool strip_quotes(char *str)
 // returns error message, or NULL for success
 static const char *parse_list_of_floats(const char *str, float *dest, int len)
 {
-    if (str[0] != '[') {
+    if (str[0] != '[')
         return "list must start with '['";
-    }
     str++;
 
     for (int i = 0; i < len; i++) {
         if (i > 0) {
-            if (*str != ',') {
+            if (*str == ']')
+                return "list is too short";
+            if (*str != ',')
                 return "missing ','";
-            }
             str++;
         }
 
@@ -176,9 +176,10 @@ static const char *parse_list_of_floats(const char *str, float *dest, int len)
         str += end-str;
     }
 
-    if (strcmp(str, "]")) {
-        return "list must end with '['";
-    }
+    if (str[0] == ',')
+        return "list is too long";
+    if (strcmp(str, "]"))
+        return "list must end with ']'";
 
     return NULL;
 }
@@ -189,9 +190,7 @@ static void read_config_file(const char *path, struct Config *conf)
 
     FILE *f = fopen(path, "r");
     if (!f) {
-        // TODO: test
         fail("cannot read config file \"%s\"", path);
-        exit(1);
     }
 
     struct ChannelConfig *current_channel = NULL;
@@ -211,7 +210,6 @@ static void read_config_file(const char *path, struct Config *conf)
             continue;
 
         if (indent && !current_channel) {
-            // TODO: test
             fail("config file \"%s\", line %d: unexpected indentation", path, lineno);
         }
         if (!indent && current_channel) {
@@ -230,7 +228,6 @@ static void read_config_file(const char *path, struct Config *conf)
 
         char *eq = strstr(line, "=");
         if (!eq) {
-            // TODO: test
             fail("config file \"%s\", line %d: invalid syntax", path, lineno);
         }
 
@@ -243,7 +240,6 @@ static void read_config_file(const char *path, struct Config *conf)
         if (!current_channel && !strcmp(key, "audio_device")) {
             strip_quotes(value);
             if (strlen(value) >= sizeof(conf->audio_device)) {
-                // TODO: test
                 fail("config file \"%s\", line %d: audio_device is too long", path, lineno);
             }
             strcpy(conf->audio_device, value);
@@ -269,16 +265,15 @@ static void read_config_file(const char *path, struct Config *conf)
                 }
             }
             if (!found) {
-                fail("config file \"%s\", line %d: metric '%s' not found", path, lineno, value);
+                fail("config file \"%s\", line %d: metric \"%s\" not found", path, lineno, value);
             }
         } else {
-            show_warning("config file contains an unknown setting '%s' on line %d", key, lineno);
+            show_warning("config file \"%s\" contains an unknown setting '%s' on line %d", path, key, lineno);
         }
     }
 
     fclose(f);
 
-    // TODO: test
     #define CheckMissing(Val, Name) do{ if (!(Val)) { fail("config file \"%s\" is missing %s", path, (Name)); } } while(0)
         CheckMissing(conf->audio_device[0], "audio_device");
         CheckMissing(conf->sample_rate, "sample_rate");
@@ -494,7 +489,6 @@ static int write_all(int fd, const void *buf, size_t nbytes)
 int main(int argc, char **argv)
 {
     if (argc != 2 || argv[1][0] == '-') {
-        // TODO: test this
         fprintf(stderr, "Usage: %s your-mittari-config-file.conf\n", argv[0]);
         return 2;
     }
