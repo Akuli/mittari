@@ -55,6 +55,12 @@ this line is invalid syntax
     ]
 
 
+def test_example_config(capsys):
+    conf = load_config(Path("example-config.conf"))
+    assert conf["audio_device"] == "front:CARD=Device,DEV=0"
+    assert capsys.readouterr() == ('', '')
+
+
 def test_map_percentage_to_gain():
     calibration_values = [
         0,      # 0%
