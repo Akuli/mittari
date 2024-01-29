@@ -69,19 +69,17 @@ def load_config(path: Path) -> Config:
                 section_name = line.rstrip(":")
                 if section_name not in result:
                     print(f"Warning: line {lineno} of config file contains an unknown section {section_name!r}")
-                    result[section_name] = {}  # TODO: test keeping unknown values around
+                    result[section_name] = {}
                 current_section = result[section_name]  # type: ignore
                 continue
 
             match = re.fullmatch(r'(\w+) *= *(.*)', line)
             if match is None:
-                # TODO: test
                 print(f"Warning: line {lineno} of config file contains invalid syntax")
                 continue
 
             key, value = match.groups()
             if key not in current_section:
-                # TODO: test
                 print(f"Warning: line {lineno} of config file contains an unknown key {key!r}")
             current_section[key] = json.loads(value)
 
