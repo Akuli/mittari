@@ -30,4 +30,4 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - run: pip install -r requirements-dev.txt
-    - run: python3 -m pytest
+    - run: python3 -m pytest -v
