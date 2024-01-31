@@ -34,9 +34,9 @@ than the 500mA limit of USB 2.0.
 ![picture of CPU and RAM scales](images/scales.jpg)
 
 I scanned the original mA scale with a scanner,
-used LibreOffice Draw to draw custom scales of the same size
-and then printed them onto paper and glued them on the back sides of the original scales.
-In this repo, scales.odg is the drawing file.
+drew my own scale on top of it,
+and then printed my scales onto paper and glued them on the back sides of the original scales.
+In this repo, scales.odg is the LibreOffice drawing file.
 
 The first gluing attempt was a failure.
 The glue basically went through the paper and made it look darker.
