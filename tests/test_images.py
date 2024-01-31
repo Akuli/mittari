@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.skipif(
-    shutil.which("file") is None,
+    shutil.which("identify") is None,
     reason="imagemagic not installed, it's needed to find image sizes"
 )
 @pytest.mark.parametrize("image_filename", glob.glob("images/*.jpg"))
