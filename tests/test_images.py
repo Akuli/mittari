@@ -19,7 +19,6 @@ def test_jpg_sizes(image_filename):
     assert height <= 1000
 
 
-def test_resized_image_exists(image_filename):
+def test_resized_images_exist():
     for filename in os.listdir("images/large-to-be-resized-with-script"):
-        if not os.path.exists(f"images/{image_filename}"):
-            raise Exception("you need to run images/resize.sh")
+        assert os.path.exists(f"images/{filename}"), "you need to run images/resize.sh"
