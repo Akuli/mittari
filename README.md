@@ -40,7 +40,7 @@ In this repo, scales.odg is the drawing file.
 
 The first gluing attempt was a failure.
 The glue basically went through the paper and made it look darker.
-To fix this, I applied glue only to the bottom,
+To work around this, I applied glue only to the bottom,
 and relied on the plastic case to hold down the paper elsewhere.
 
 
