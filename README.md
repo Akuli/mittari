@@ -285,7 +285,7 @@ $ while true; do :; done
 
 Figure some way to run the `mittari` executable when the system boots.
 Remember to pass the path to your config file as an argument to it.
-For example, you could: add a command to `.profile` or `.xsessionrc`,
+For example, you could add a command to `.profile` or `.xsessionrc`,
 so the meters start working when you log in.
 
 For some reason, I wanted the meters to start working before I even log in.
