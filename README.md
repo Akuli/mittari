@@ -1,9 +1,8 @@
 # Mittari
 
-https://github.com/Akuli/mittari/assets/18505570/467ddbf9-522e-461b-a0d6-3eb654f96346
+https://github.com/Akuli/mittari/assets/18505570/8fe26e2d-5717-4242-8159-7ad8b30a4cea
 
 This project is an analog CPU and RAM meter for my computer.
-The left meter is for CPU usage and the right is for RAM.
 It involves woodworking, electronics, analog audio, digital audio, Python, tkinter, C, and a few other things.
 
 The idea is taken from [this youtube video](https://www.youtube.com/watch?v=4J-DTbZlJ5I).
@@ -29,10 +28,20 @@ The meters are [this product from AliExpress](https://www.aliexpress.com/item/10
 I used the 5mA version, so that the meters would consume much less current
 than the 500mA limit of USB 2.0.
 
-I am planning to scan the original mA scale with a scanner,
-and then print custom scales onto paper and attach them on top of the original scale.
-My custom scales will go from 0% to 100% instead of 0mA to 5mA,
-and I will label them `CPU` and `RAM` instead of `mA`.
+
+## Custom Scales
+
+![picture of CPU and RAM scales](images/scales.jpg)
+
+I scanned the original mA scale with a scanner,
+drew my own scale on top of it,
+and then printed my scales onto paper and glued them on the back sides of the original scales.
+In this repo, scales.odg is the LibreOffice drawing file.
+
+The first gluing attempt was a failure.
+The glue basically went through the paper and made it look darker.
+To work around this, I applied glue only to the bottom,
+and relied on the plastic case to hold down the paper elsewhere.
 
 
 ## Woodworking
