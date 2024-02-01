@@ -270,3 +270,19 @@ After causing lags, I started and stopped an infinite loop to see how quickly th
 ```
 $ while true; do :; done
 ```
+
+
+## Installation
+
+Figure some way to run the `mittari` executable when the system boots.
+Remember to pass the path to your config file as an argument to it.
+For example, you could: add a command to `.profile` or `.xsessionrc`,
+so the meters start working when you log in.
+
+For some reason, I wanted the meters to start working before I even log in.
+I placed the executable and config file to a new folder `/opt/mittari`.
+Then I created a user `mittari` with `sudo adduser --system mittari`
+and added it to the `audio` group,
+hoping that audio would continue to work for my `akuli` user.
+I then added `su -s /bin/bash mittari -c "/opt/mittari/mittari /opt/mittari/config.conf"` to `/etc/rc.local`.
+If I had `systemd`, I probably would have created a service file instead.
