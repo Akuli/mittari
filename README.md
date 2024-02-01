@@ -1,6 +1,6 @@
 # Mittari
 
-https://github.com/Akuli/mittari/assets/18505570/467ddbf9-522e-461b-a0d6-3eb654f96346
+https://github.com/Akuli/mittari/assets/18505570/8fe26e2d-5717-4242-8159-7ad8b30a4cea
 
 This project is an analog CPU and RAM meter for my computer.
 It involves woodworking, electronics, analog audio, digital audio, Python, tkinter, C, and a few other things.
