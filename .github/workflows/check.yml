@@ -31,3 +31,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - run: pip install -r requirements-dev.txt
     - run: python3 -m pytest -v
+
+  markdown-links:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: pip
+    - run: pip install requests
+    - run: python3 check-markdown-links.py
