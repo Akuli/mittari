@@ -127,7 +127,7 @@ that you can open with [circuitjs](https://www.falstad.com/circuit/circuitjs.htm
 Alternatively, if you don't want to clone this repository,
 copy the file's content and paste it to "Import from Text" in circuitjs.
 
-Here is a walk-through of the circuit:
+Here is a walk-through of the circuit, from left to right:
 
 - The audio signal goes through a high-pass filter (100nF cap and 56k resistor).
 - The two diodes (1N4148) limit the input voltage to about +-0.7V.
@@ -146,10 +146,10 @@ Here is a walk-through of the circuit:
     The red LEDs begin to turn at about 75%,
     and there's almost no yellow light when a meter is displaying 100%.
 
-For some reason, the 100nF caps after the op-amp
+For some reason, the 100nF caps
 get charged to 270mV on one channel and 400mV on the other channel
 when there is no audio coming in.
-I'm not sure why that happens, but it doesn't really matter
+I'm not sure why that happens, but it doesn't matter
 as long as these weird voltages aren't enough to turn on the transistors.
 
 With a 1kHz input signal, the 100nF capacitors need to remember the voltage
@@ -164,13 +164,11 @@ because the AliExpress current meters are horribly inaccurate.
 Here are some improvements I might make if I was building this again:
 
 - Remove the high pass filter and protection diodes. They are unnecessary.
-- Use a larger capacitor after the op-amp.
+- Use a larger capacitor.
     This would make the circuit easier to debug, because the voltage would bounce around less.
-    It would also make the circuit less dependent on transistor current gain (beta) values:
-    smaller current gain means that more current flows through the base of transistor,
-    and the capacitor voltage bounces more.
+    It would also make the circuit less dependent on transistor current gain (beta) values.
 - Add a resistor to the base of the transistor that drives the red LEDs,
-    so that the output coming from the 100nF capacitor can raise higher than the transistor's base.
+    so that the capacitor's voltage can raise higher than the transistor's base.
     In the version I built, the 470ohm current meter resistor was chosen
     so that the meters reach their maximum value just before the transistor limits the voltage.
 - Test the circuit with 4.75V and 5.25V, and fix it if it doesn't work.
