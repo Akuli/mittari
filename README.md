@@ -125,49 +125,64 @@ The other half is similar.
 The repository contains [a circuitjs file](./mittari.circuitjs.txt)
 that you can open with [circuitjs](https://www.falstad.com/circuit/circuitjs.html).
 Alternatively, if you don't want to clone this repository,
-copy the file's content and paste them to "Import from Text" in circuitjs.
+copy the file's content and paste it to "Import from Text" in circuitjs.
 
-Here is a walk-through of the circuit:
+Here is a walk-through of the circuit, from left to right:
 
-- The audio signal is passed through a high-pass filter (100nF cap and 56k resistor).
-    In hindsight, this is unnecessary,
-    because the audio coming from the USB sound card does not have any DC offset.
-    The cutoff frequency of the filter is `1/(2*pi*R*C) ≈ 28 Hz`,
-    so it will easily let my 1kHz sine wave through.
-- The two diodes (1N4148) protect the op-amp from large input voltages
-    in case I accidentally touch the audio cable to +5V, for example.
-- The op-amp (UA798TC) is basically a non-inverting amplifier with gain `1 + 180k/1.8k ≈ 100`,
+- The audio signal goes through a high-pass filter (100nF cap and 56k resistor).
+- The two diodes (1N4148) limit the input voltage to about +-0.7V.
+- The op-amp (UA798TC) is basically a non-inverting amplifier with a gain of about 100,
     but because of the diode at its output,
     it can only increase the output voltage, not decrease it.
     This causes the circuit to compute the maximum (peak) value of the audio signal.
     The small 1k resistor represents the internal output resistance of the op-amp.
-- The 100nF cap after the op-amp remembers the maximum voltage of the input signal.
-    For some reason, my 100nF caps get 270mV on one channel and 400mV on the other channel
-    when there is no audio coming in.
-    I'm not sure why that happens, but it doesn't really matter
-    as long as these weird voltages aren't enough to turn on the transistors.
-    With a 1kHz input signal, these capacitors need to remember the voltage accurately enough for about 1ms.
-    Because the current gain of a BC549C transistor is about 500,
-    and because the LEDs and the meter only consume about `20mA + 5mA`,
-    the capacitor discharges with current `25mA / 500 = 50uA`.
-    In one millisecond, the voltage changes by about `1/C ∫ I dt = (50uA * 1ms) / 100nF = 0.5V`.
-    This sounds bad, but I just compensate for this (and other inaccuracies) in software.
-    I could use a bigger cap or a higher frequency,
-    but I had lots of 100nF caps and I wanted to use them,
-    and 1kHz seems to work fine.
+- The 100nF capacitor after the op-amp remembers the maximum voltage of the input signal.
 - The current meter (bottom of picture) is driven through a BC549C transistor,
-    connected as a voltage follower, and a 470 ohm resistor.
-    The meter displays its maximum value of 5mA
-    when the transistor gets an average voltage of `470ohm * 5mA + 0.6V ≈ 3V` at its base.
-    In practice, this voltage will bounce between about 2.75V and 3.25V because of the 0.5V discharging.
-    This doesn't matter, because the meter isn't fast enough to move along with the varying voltage.
+    connected as a voltage follower, and a 470 ohm series resistor.
 - The LED transistors use [this transistor trick](https://electronics.stackexchange.com/q/164068)
     to turn on either yellow or red LEDs depending on the voltage.
     The two transistors basically act as a comparator,
-    comparing the output of the op-amp to `18k/(12k+18k) * 5V = 3V`
-    given by the voltage divider on the right.
+    comparing the output of the op-amp to 3V given by the voltage divider on the right.
     The red LEDs begin to turn at about 75%,
     and there's almost no yellow light when a meter is displaying 100%.
+
+For some reason, the 100nF caps
+get charged to 270mV on one channel and 400mV on the other channel
+when there is no audio coming in.
+I'm not sure why that happens, but it doesn't matter
+as long as these weird voltages aren't enough to turn on the transistors.
+
+With a 1kHz input signal, the 100nF capacitors need to remember the voltage
+accurately enough for about 1ms.
+In reality, this is far from accurate.
+For example, when a meter displays 100%, the capacitor's voltage bounces between about 2.75V and 3.25V.
+This doesn't really matter though, because the bouncing happens at 1kHz
+and the meters cannot physically move back and forth at a 1kHz frequency.
+Also, I need to compensate for inaccuracy in software anyway,
+because the AliExpress current meters are horribly inaccurate.
+
+Here are some improvements I might make if I was building this again:
+
+- Remove the high pass filter and protection diodes. They are unnecessary.
+- Use a larger capacitor.
+    This would make the circuit easier to debug, because the voltage would bounce around less.
+    It would also make the circuit less dependent on transistor current gain (beta) values.
+- Add a resistor to the base of the transistor that drives the red LEDs,
+    so that the capacitor's voltage can raise higher than the transistor's base.
+    In the version I built, the 470ohm current meter resistor was chosen
+    so that the meters reach their maximum value just before the transistor limits the voltage.
+- Test the circuit with 4.75V and 5.25V, and fix it if it doesn't work.
+    These are the smallest and biggest allowed "5V" voltages in the USB spec.
+
+
+## Layout
+
+![layout](images/layout.png)
+
+I laid out the components onto stripboard using
+[DIY Layout Creator](https://diy-fever.com/software/diylc/).
+It is not the best possible software for doing this, but it works.
+The DIYLC file is `layout.diy` in this repository.
 
 
 ## Supported operating system
