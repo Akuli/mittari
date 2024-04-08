@@ -125,7 +125,7 @@ The other half is similar.
 The repository contains [a circuitjs file](./mittari.circuitjs.txt)
 that you can open with [circuitjs](https://www.falstad.com/circuit/circuitjs.html).
 Alternatively, if you don't want to clone this repository,
-copy the file's content and paste them to "Import from Text" in circuitjs.
+copy the file's content and paste it to "Import from Text" in circuitjs.
 
 Here is a walk-through of the circuit:
 
@@ -136,7 +136,7 @@ Here is a walk-through of the circuit:
     it can only increase the output voltage, not decrease it.
     This causes the circuit to compute the maximum (peak) value of the audio signal.
     The small 1k resistor represents the internal output resistance of the op-amp.
-- The 100nF cap after the op-amp remembers the maximum voltage of the input signal.
+- The 100nF capacitor after the op-amp remembers the maximum voltage of the input signal.
 - The current meter (bottom of picture) is driven through a BC549C transistor,
     connected as a voltage follower, and a 470 ohm series resistor.
 - The LED transistors use [this transistor trick](https://electronics.stackexchange.com/q/164068)
@@ -158,7 +158,8 @@ In reality, this is far from accurate.
 For example, when a meter displays 100%, the capacitor's voltage bounces between about 2.75V and 3.25V.
 This doesn't really matter though, because the bouncing happens at 1kHz
 and the meters cannot physically move back and forth at a 1kHz frequency.
-It's also easy to compensate for the bouncing in software.
+Also, I need to compensate for inaccuracy in software anyway,
+because the AliExpress current meters are horribly inaccurate.
 
 Here are some improvements I might make if I was building this again:
 
@@ -168,11 +169,10 @@ Here are some improvements I might make if I was building this again:
     It would also make the circuit less dependent on transistor current gain (beta) values:
     smaller current gain means that more current flows through the base of transistor,
     and the capacitor voltage bounces more.
-- I would add a resistor to the base of the transistor that drives the red LEDs,
-    so that the output coming from the 100nF capacitor
-    isn't limited by the diode-like behavior of the transistor's base-emitter junction.
+- Add a resistor to the base of the transistor that drives the red LEDs,
+    so that the output coming from the 100nF capacitor can raise higher than the transistor's base.
     In the version I built, the 470ohm current meter resistor was chosen
-    so that the meters barely reach their maximum value before running into this limit.
+    so that the meters reach their maximum value just before the transistor limits the voltage.
 - Test the circuit with 4.75V and 5.25V, and fix it if it doesn't work.
     These are the smallest and biggest allowed "5V" voltages in the USB spec.
 
