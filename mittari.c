@@ -481,6 +481,7 @@ static int write_all(int fd, const void *buf, size_t nbytes)
             return -1;
         }
         nbytes -= wrote;
+        buf = (const char *)buf + wrote;
     }
     return 0;
 }
