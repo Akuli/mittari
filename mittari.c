@@ -514,6 +514,7 @@ int main(int argc, char **argv)
 
             kill(aplay.pid, SIGKILL);
             waitpid(aplay.pid, NULL, 0);
+            close(aplay.stdin_fd);
 
             nanosleep(&(struct timespec){ .tv_sec = 1 }, NULL);
             aplay = start_aplay(&conf);
