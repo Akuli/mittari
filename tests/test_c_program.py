@@ -77,5 +77,5 @@ def test_aplay_invocation(mittari, tmp_path, monkeypatch):
 
     assert (
         (tmp_path / "aplay_args.txt").read_text().strip()
-        == '--format S16_LE --rate 44100 --channels 2 --device front:CARD=Device,DEV=0 --buffer-time 100000'
+        == '--format S16_LE --rate 44100 --channels 2 --device hw:CARD=Device,DEV=0 --buffer-time 100000'
     )
