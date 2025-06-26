@@ -410,7 +410,7 @@ static struct timespec add_timespecs(const struct timespec *a, const struct time
 {
     time_t sec = a->tv_sec + b->tv_sec;
     long long nanosec = (long long)a->tv_nsec + (long long)b->tv_nsec;
-    if (nanosec > one_sec_as_nanosec) {
+    if (nanosec >= one_sec_as_nanosec) {
         nanosec -= one_sec_as_nanosec;
         sec++;
     }
