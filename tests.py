@@ -6,11 +6,9 @@ import io
 import sys
 import subprocess
 import shutil
-import shlex
-from pathlib import Path
 import traceback
+from pathlib import Path
 
-sys.path.append("..")
 from config import (
     list_audio_devices,
     load_config,
