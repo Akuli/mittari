@@ -6,22 +6,27 @@ on:
 
 jobs:
   mypy:
-    timeout-minutes: 1
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: "3.13"
+        python-version: "3.12"
     - run: pip install mypy==1.8.0
-    - run: mypy config.py
+    - run: |
+        mypy --platform linux --python-version 3.10 config.py
+        mypy --platform linux --python-version 3.11 config.py
+        mypy --platform linux --python-version 3.12 config.py
 
   tests:
-    timeout-minutes: 1
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: "3.13"
+        python-version: ${{ matrix.python-version }}
     - run: python3 tests.py
