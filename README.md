@@ -238,9 +238,9 @@ Developing the config script:
 ```
 $ python3 -m venv env
 $ source env/bin/activate
-$ pip install -r requirements-dev.txt
-$ mypy config.py        # type checker
-$ python3 -m pytest     # run tests
+$ pip install mypy
+$ mypy config.py     # type checker
+$ python3 tests.py   # run tests
 ```
 
 
